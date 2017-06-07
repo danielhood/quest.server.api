@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"log"
 
   "github.com/danielhood/loco.server/services"
 )
@@ -19,6 +20,8 @@ func NewToken() *Token {
 func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
+		log.Print("/token:GET")
+
 		// TODO: Take in login information
 		user := &services.User{
 			Id:        1,
@@ -31,6 +34,7 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, "Failed to generate token", http.StatusInternalServerError)
 		}
 		w.Write([]byte(token))
+
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}

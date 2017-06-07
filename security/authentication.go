@@ -13,7 +13,7 @@ type Authentication struct {
 }
 
 func NewAuthentication() *Authentication {
-  
+
   return &Authentication{
     encryptionKey: []byte("abxx002151!"),
   }
@@ -57,6 +57,7 @@ func (a *Authentication) Authenticate(next http.Handler) http.Handler {
     			// Everything worked! Set the user in the context.
           fmt.Println("User authenticated")
     			next.ServeHTTP(w, r)
+          return
     		}
 
     		// Token is invalid

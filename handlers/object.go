@@ -7,21 +7,21 @@ import (
   "github.com/danielhood/loco.server/services"
 )
 
-type Ping struct {
-  svc services.Ping
+type Object struct {
+  svc services.Object
 }
 
-func NewPing() *Ping {
-  return &Ping{services.NewPing()}
+func NewObject() *Object {
+  return &Object{services.NewObject()}
 }
 
-func (h *Ping) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (h *Object) ServeHTTP(w http.ResponseWriter, req *http.Request) {
     switch req.Method {
     case "GET":
-        log.Print("/ping:GET")
+        log.Print("/object:GET")
 
-        s := h.svc.Get()
-        w.Write([]byte(s))
+        j, _ := h.svc.GetAll()
+        w.Write(j)
 
     default:
         http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
