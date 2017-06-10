@@ -1,14 +1,14 @@
 package entities
 
 const (
-  ObjectType1 = iota
-  ObjectType2 = iota
-  ObjectType3 = iota
+  ObjectType1 = "type1"
+  ObjectType2 = "type2"
+  ObjectType3 = "type3"
 )
 
 type Object struct {
   Id uint `json:"id"`
-  Type uint `json:"type"`
+  Type string `json:"type"`
   Name string `json:"name"`
   X float32 `json:"x"`
   Y float32 `json:"y"`

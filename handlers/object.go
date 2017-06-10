@@ -21,6 +21,7 @@ func (h *Object) ServeHTTP(w http.ResponseWriter, req *http.Request) {
         log.Print("/object:GET")
 
         j, _ := h.svc.GetAll()
+        log.Print("Objects:%v", string(j))
         w.Write(j)
 
     default:
