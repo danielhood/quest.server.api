@@ -12,6 +12,30 @@ import (
 func main () {
   log.Print("Loco server starting...")
 
+  log.Print("Loading users...")
+
+  userRepo := repositories.NewUserRepo()
+
+  userRepo.Add(&entities.User{
+    Id:        1,
+    Username:  "admin",
+    Password:  "admin",
+    FirstName: "Admin",
+    LastName:  "User",
+    Roles:     []string{entities.AdministratorRole},
+    IsOnline:    false,
+  })
+
+  userRepo.Add(&entities.User{
+    Id:        2,
+    Username:  "test",
+    Password:  "test",
+    FirstName: "Test",
+    LastName:  "User",
+    Roles:     []string{},
+    IsOnline:    false,
+  })
+
   log.Print("Generating objects...")
 
   objectRepo := repositories.NewObjectRepo()

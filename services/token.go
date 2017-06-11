@@ -7,6 +7,8 @@ import (
   "strconv"
 
 	"github.com/dgrijalva/jwt-go"
+
+	"github.com/danielhood/loco.server/entities"
 )
 
 // Set our secret.
@@ -17,7 +19,7 @@ type Token string
 
 // TokenService provides a token
 type TokenService interface {
-	Get(u *User) (string, error)
+	Get(u *entities.User) (string, error)
 }
 
 type tokenService struct {
@@ -25,7 +27,7 @@ type tokenService struct {
 
 type UserClaims struct{
   Admin bool  `json:"admin"`
-  User  User  `json:"user"`
+  User  entities.User  `json:"user"`
   jwt.StandardClaims
 }
 
@@ -36,13 +38,13 @@ func NewTokenService() TokenService {
 
 // Get retrieves a token for a user
 // TODO: Take user credentials and verify them against what's in database
-func (s *tokenService) Get(u *User) (string, error) {
+func (s *tokenService) Get(u *entities.User) (string, error) {
 	// Set token claims
   claims := UserClaims {
     u.HasRole("AdministratorRole"),
     *u,
     jwt.StandardClaims {
-      Id: strconv.Itoa(u.Id),
+      Id: strconv.Itoa((int)(u.Id)),
       ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
       Issuer: "token-service",
     },

@@ -5,15 +5,20 @@ import (
 	"log"
 
   "github.com/danielhood/loco.server/services"
+	"github.com/danielhood/loco.server/repositories"
 )
 
 type Token struct {
 	Service services.TokenService
+	userRepo repositories.UserRepo
 }
 
 // NewToken creates new handler for tokens
 func NewToken() *Token {
-	return &Token{services.NewTokenService()}
+	return &Token{
+		services.NewTokenService(),
+		repositories.NewUserRepo(),
+	}
 }
 
 // Handler will return tokens
@@ -22,13 +27,12 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	case "GET":
 		log.Print("/token:GET")
 
-		// TODO: Take in login information
-		user := &services.User{
-			Id:        1,
-			FirstName: "Admin",
-			LastName:  "User",
-			Roles:     []string{services.AdministratorRole},
+		// TODO: Lookup user based on login information passed into token get
+		user, err := t.userRepo.Get(1)
+		if (err != nil) {
+			http.Error(w, "Failed to verify user credentials", http.StatusInternalServerError)
 		}
+
 		token, err := t.Service.Get(user)
 		if err != nil {
 			http.Error(w, "Failed to generate token", http.StatusInternalServerError)

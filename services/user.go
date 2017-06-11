@@ -1,75 +1,38 @@
 package services
 
-var users map[int]*User
-
-func init() {
-	users = make(map[int]*User)
-	user := &User{
-		Id:        1,
-		FirstName: "Admin",
-		LastName:  "User",
-		Roles:     []string{AdministratorRole},
-	}
-
-	user2 := &User{
-		Id:        2,
-		FirstName: "Test",
-		LastName:  "User",
-		Roles:     []string{},
-	}
-
-	users[user.Id] = user
-	users[user2.Id] = user2
-}
-
-// User defines a user for our application
-type User struct {
-	Id        int
-	FirstName string
-	LastName  string
-	Roles     []string
-}
-
-// HasRole returns true if the user is in the role
-func (u *User) HasRole(roleName string) bool {
-	for _, role := range u.Roles {
-		if role == roleName {
-			return true
-		}
-	}
-	return false
-}
+import (
+  "github.com/danielhood/loco.server/entities"
+	"github.com/danielhood/loco.server/repositories"
+)
 
 // UserService provides a CRUD interface for Users
 type UserService interface {
-	Create(*User) error
-	Read(int) (*User, error)
-	Update(*User) error
-	Delete(int) error
+	Create(*entities.User) error
+	Read(uint) (*entities.User, error)
+	Update(*entities.User) error
 }
 
 // NewUserService creates a new UserService
 func NewUserService() UserService {
-	return &userService{}
+	return &userService{
+		userRepo: repositories.NewUserRepo(),
+	}
 }
 
-type userService struct{}
-
-func (s *userService) Create(u *User) error {
-	users[u.Id] = u
-	return nil
+type userService struct{
+	userRepo repositories.UserRepo
 }
 
-func (s *userService) Read(id int) (*User, error) {
-	return users[id], nil
+func (s *userService) Create(u *entities.User) error {
+	return s.userRepo.Add(u)
 }
 
-func (s *userService) Update(u *User) error {
-	users[u.Id] = u
-	return nil
+func (s *userService) Read(id uint) (*entities.User, error) {
+	return s.userRepo.Get(id)
 }
 
-func (s *userService) Delete(id int) error {
-	delete(users, id)
-	return nil
+func (s *userService) Update(u *entities.User) error {
+	return s.userRepo.Add(u)
 }
+
+// TODO: Delete
