@@ -1,2 +1,2 @@
 # loco.server
-Server for loco
+Server for quest API
