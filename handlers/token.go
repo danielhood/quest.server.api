@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"log"
 
-  "github.com/danielhood/loco.server/services"
-	"github.com/danielhood/loco.server/repositories"
+  "github.com/danielhood/quest.server.api/services"
+	"github.com/danielhood/quest.server.api/repositories"
 )
 
 type Token struct {
@@ -25,7 +25,9 @@ func NewToken() *Token {
 func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		log.Print("/token:GET")
+		log.Print("/token:GETxx")
+
+		log.Print("GET params were:", req.URL.Query())
 
 		// TODO: Lookup user based on login information passed into token get
 		user, err := t.userRepo.Get(1)

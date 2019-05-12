@@ -3,7 +3,7 @@ package services
 import (
   "encoding/json"
 
-  "github.com/danielhood/loco.server/repositories"
+  "github.com/danielhood/quest.server.api/repositories"
 )
 
 type Object interface {

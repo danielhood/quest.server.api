@@ -8,7 +8,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/danielhood/loco.server/entities"
+	"github.com/danielhood/quest.server.api/entities"
 )
 
 // Set our secret.

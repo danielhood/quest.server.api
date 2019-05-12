@@ -1,8 +1,8 @@
 package services
 
 import (
-  "github.com/danielhood/loco.server/entities"
-	"github.com/danielhood/loco.server/repositories"
+  "github.com/danielhood/quest.server.api/entities"
+  "github.com/danielhood/quest.server.api/repositories"
 )
 
 // UserService provides a CRUD interface for Users

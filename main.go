@@ -3,10 +3,10 @@ package main
 import (
   "log"
   "net/http"
-  "github.com/danielhood/loco.server/handlers"
-  "github.com/danielhood/loco.server/security"
-  "github.com/danielhood/loco.server/repositories"
-  "github.com/danielhood/loco.server/entities"
+  "github.com/danielhood/quest.server.api/handlers"
+  "github.com/danielhood/quest.server.api/security"
+  "github.com/danielhood/quest.server.api/repositories"
+  "github.com/danielhood/quest.server.api/entities"
 )
 
 func main () {

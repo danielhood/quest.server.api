@@ -4,7 +4,7 @@ import (
   "errors"
   "log"
 
-  "github.com/danielhood/loco.server/entities"
+  "github.com/danielhood/quest.server.api/entities"
 )
 
 // TODO: Move this to somewhere better (redis?)

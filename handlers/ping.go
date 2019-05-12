@@ -4,7 +4,7 @@ import (
   "net/http"
   "log"
 
-  "github.com/danielhood/loco.server/services"
+  "github.com/danielhood/quest.server.api/services"
 )
 
 type Ping struct {
