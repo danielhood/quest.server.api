@@ -1,8 +1,8 @@
 package services
 
 import (
-  "github.com/danielhood/quest.server.api/entities"
-  "github.com/danielhood/quest.server.api/repositories"
+	"github.com/danielhood/quest.server.api/entities"
+	"github.com/danielhood/quest.server.api/repositories"
 )
 
 // UserService provides a CRUD interface for Users
@@ -19,7 +19,7 @@ func NewUserService() UserService {
 	}
 }
 
-type userService struct{
+type userService struct {
 	userRepo repositories.UserRepo
 }
 

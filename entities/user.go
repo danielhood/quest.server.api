@@ -1,18 +1,20 @@
 package entities
 
 const (
-  AdministratorRole = "administrator"
+	// AdministratorRole defines role of administrator
+	AdministratorRole = "administrator"
 )
 
 // User defines a user for our application
 type User struct {
-	Id        uint  `json:"id"`
-  Username  string `json:"username"`
-  Password  string `json:"password"`
-	FirstName string `josn:"firstname"`
-	LastName  string `json:"lastname"`
+	ID        uint     `json:"id"`
+	Username  string   `json:"username"`
+	Password  string   `json:"password"`
+	FirstName string   `josn:"firstname"`
+	LastName  string   `json:"lastname"`
 	Roles     []string `json:"roles"`
-  IsOnline    bool `json:"isonline"`
+	IsOnline  bool     `json:"isonline"`
+	IsEnabled bool     `json:"isenabled"`
 }
 
 // HasRole returns true if the user is in the role

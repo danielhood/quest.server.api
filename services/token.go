@@ -2,9 +2,9 @@ package services
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
-  "fmt"
-  "strconv"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -25,10 +25,10 @@ type TokenService interface {
 type tokenService struct {
 }
 
-type UserClaims struct{
-  Admin bool  `json:"admin"`
-  User  entities.User  `json:"user"`
-  jwt.StandardClaims
+type UserClaims struct {
+	Admin bool          `json:"admin"`
+	User  entities.User `json:"user"`
+	jwt.StandardClaims
 }
 
 // NewTokenService creates a new UserService
@@ -40,17 +40,17 @@ func NewTokenService() TokenService {
 // TODO: Take user credentials and verify them against what's in database
 func (s *tokenService) Get(u *entities.User) (string, error) {
 	// Set token claims
-  claims := UserClaims {
-    u.HasRole("AdministratorRole"),
-    *u,
-    jwt.StandardClaims {
-      Id: strconv.Itoa((int)(u.Id)),
-      ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-      Issuer: "token-service",
-    },
-  }
+	claims := UserClaims{
+		u.HasRole("AdministratorRole"),
+		*u,
+		jwt.StandardClaims{
+			Id:        strconv.Itoa((int)(u.ID)),
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			Issuer:    "token-service",
+		},
+	}
 
-  // Create token
+	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign token with key
@@ -59,7 +59,7 @@ func (s *tokenService) Get(u *entities.User) (string, error) {
 		return "", errors.New("Failed to sign token")
 	}
 
-  fmt.Printf("Generated Token for %v %v: %v", u.FirstName, u.LastName, tokenString)
+	fmt.Printf("Generated Token for %v %v: %v", u.FirstName, u.LastName, tokenString)
 
 	return tokenString, nil
 }
