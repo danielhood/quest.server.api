@@ -3,6 +3,7 @@ package repositories
 // https://github.com/go-redis/redis
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -17,19 +18,22 @@ var users map[uint]*entities.User
 var redisClient *redis.Client
 
 func init() {
-	users = make(map[uint]*entities.User)
-
 	redisClient = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+
+	// Default strucutre
+	users = make(map[uint]*entities.User)
 }
 
 type UserRepo interface {
 	GetAll() ([]entities.User, error)
 	Get(id uint) (*entities.User, error)
 	Add(o *entities.User) error
+	Load() error
+	Store() error
 }
 
 type userRepo struct {
@@ -41,12 +45,6 @@ func NewUserRepo() UserRepo {
 
 func (r *userRepo) GetAll() ([]entities.User, error) {
 	allUsers := make([]entities.User, len(users))
-
-	userJSON, err := redisClient.Get("users").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("usersJson", userJSON)
 
 	idx := 0
 	for _, value := range users {
@@ -72,10 +70,46 @@ func (r *userRepo) Add(u *entities.User) error {
 	if existing != nil {
 		// merge only online status for now
 		existing.IsOnline = u.IsOnline
-		return nil
+	} else {
+		users[u.ID] = u
 	}
 
-	users[u.ID] = u
+	return r.Store()
+}
+
+// Store saves data to redis
+func (r *userRepo) Store() error {
+	log.Print("Saving users")
+
+	usersJSON, err := json.Marshal(users)
+	if err != nil {
+		return err
+	}
+
+	log.Print("usersJSON: ", string(usersJSON))
+
+	err = redisClient.Set("users", usersJSON, 0).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Load retrieves data from redis
+func (r *userRepo) Load() error {
+	log.Print("Loading users")
+
+	userJSON, err := redisClient.Get("users").Result()
+
+	if err != nil {
+		return err
+	}
+	fmt.Println("usersJson", userJSON)
+
+	if err = json.Unmarshal([]byte(userJSON), &users); err != nil {
+		return err
+	}
 
 	return nil
 }

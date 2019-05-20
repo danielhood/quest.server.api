@@ -17,6 +17,10 @@ func main() {
 
 	userRepo := repositories.NewUserRepo()
 
+	if err := userRepo.Load(); err != nil {
+		panic(err)
+	}
+
 	userRepo.Add(&entities.User{
 		ID:        1,
 		Username:  "admin",
@@ -36,6 +40,9 @@ func main() {
 		Roles:     []string{},
 		IsOnline:  false,
 	})
+
+	log.Print("Checking Users...")
+	userRepo.GetAll()
 
 	log.Print("Generating objects...")
 
