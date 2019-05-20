@@ -1,17 +1,29 @@
 package repositories
 
+// https://github.com/go-redis/redis
+
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/danielhood/quest.server.api/entities"
+	"github.com/go-redis/redis"
 )
 
 // TODO: Move this to somewhere better (redis?)
 var users map[uint]*entities.User
 
+var redisClient *redis.Client
+
 func init() {
 	users = make(map[uint]*entities.User)
+
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
 }
 
 type UserRepo interface {
@@ -29,6 +41,12 @@ func NewUserRepo() UserRepo {
 
 func (r *userRepo) GetAll() ([]entities.User, error) {
 	allUsers := make([]entities.User, len(users))
+
+	userJSON, err := redisClient.Get("users").Result()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("usersJson", userJSON)
 
 	idx := 0
 	for _, value := range users {
