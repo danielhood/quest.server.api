@@ -12,7 +12,6 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// TODO: Move this to somewhere better (redis?)
 var users map[uint]*entities.User
 
 var redisClient *redis.Client
