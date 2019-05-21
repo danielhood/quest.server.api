@@ -49,14 +49,12 @@ func createDefaultRoutes() {
 	pingHandler := handlers.NewPing()
 	tokenHandler := handlers.NewToken()
 	userHandler := handlers.NewUser()
-	objectHandler := handlers.NewObject()
 
 	auth := security.NewAuthentication()
 
 	http.Handle("/ping", pingHandler)
 	http.Handle("/token", tokenHandler)
 	http.Handle("/user", addMiddleware(userHandler, auth.Authenticate))
-	http.Handle("/object", addMiddleware(objectHandler, auth.Authenticate))
 }
 
 func addMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
