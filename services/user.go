@@ -14,9 +14,9 @@ type UserService interface {
 }
 
 // NewUserService creates a new UserService
-func NewUserService() UserService {
+func NewUserService(ur repositories.UserRepo) UserService {
 	return &userService{
-		userRepo: repositories.NewUserRepo(),
+		userRepo: ur,
 	}
 }
 

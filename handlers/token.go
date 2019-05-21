@@ -28,10 +28,10 @@ type TokenRequest struct {
 }
 
 // NewToken creates new handler for tokens
-func NewToken() *Token {
+func NewToken(ur repositories.UserRepo) *Token {
 	return &Token{
-		services.NewTokenService(),
-		repositories.NewUserRepo(),
+		Service:  services.NewTokenService(),
+		userRepo: ur,
 	}
 }
 

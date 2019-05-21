@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/services"
 )
 
@@ -14,8 +15,8 @@ type User struct {
 }
 
 // NewUser creates new instance of UserService
-func NewUser() *User {
-	return &User{services.NewUserService()}
+func NewUser(ur repositories.UserRepo) *User {
+	return &User{services.NewUserService(ur)}
 }
 
 func (h *User) ServeHTTP(w http.ResponseWriter, req *http.Request) {

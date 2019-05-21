@@ -5,24 +5,14 @@ package repositories
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/danielhood/quest.server.api/entities"
-	"github.com/go-redis/redis"
 )
 
 var users []entities.User
 
-var redisClient *redis.Client
-
 func init() {
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
 	// Default strucutre
 	users = make([]entities.User, 0)
 }
@@ -34,16 +24,21 @@ type UserRepo interface {
 	GetByUsername(username string) (*entities.User, error)
 	Add(o *entities.User) error
 	Delete(o *entities.User) error
-	Load() error
-	Store() error
 }
 
 type userRepo struct {
+	storageManager StorageManager
 }
 
 // NewUserRepo returns a new UserRepo instance
-func NewUserRepo() UserRepo {
-	return &userRepo{}
+func NewUserRepo(sm StorageManager) UserRepo {
+	ur := userRepo{
+		storageManager: sm,
+	}
+
+	ur.load()
+
+	return &ur
 }
 
 func (r *userRepo) GetAll() ([]entities.User, error) {
@@ -90,7 +85,7 @@ func (r *userRepo) Add(u *entities.User) error {
 		users = append(users, *u)
 	}
 
-	return r.Store()
+	return r.store()
 }
 
 func (r *userRepo) Delete(u *entities.User) error {
@@ -100,15 +95,14 @@ func (r *userRepo) Delete(u *entities.User) error {
 		if user.ID == u.ID {
 			users[i] = users[len(users)-1]
 			users = users[:len(users)-1]
-			return r.Store()
+			return r.store()
 		}
 	}
 
 	return nil
 }
 
-// Store saves data to redis
-func (r *userRepo) Store() error {
+func (r *userRepo) store() error {
 	log.Print("Saving users")
 
 	usersJSON, err := json.Marshal(users)
@@ -116,26 +110,20 @@ func (r *userRepo) Store() error {
 		return err
 	}
 
-	log.Print("usersJSON: ", string(usersJSON))
-
-	err = redisClient.Set("users", usersJSON, 0).Err()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return r.storageManager.Store("users", usersJSON)
 }
 
 // Load retrieves data from redis
-func (r *userRepo) Load() error {
+func (r *userRepo) load() error {
 	log.Print("Loading users")
 
-	userJSON, err := redisClient.Get("users").Result()
+	userJSON, err := r.storageManager.Load("users")
 
 	if err != nil {
 		return err
 	}
-	fmt.Println("usersJson", userJSON)
+
+	log.Print("usersJson", userJSON)
 
 	if len(userJSON) == 0 {
 		return nil

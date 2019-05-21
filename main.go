@@ -8,15 +8,10 @@ import (
 	"github.com/danielhood/quest.server.api/handlers"
 	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/security"
+	"github.com/go-redis/redis"
 )
 
-func generateDefaultUsers() {
-	userRepo := repositories.NewUserRepo()
-
-	if err := userRepo.Load(); err != nil {
-		panic(err)
-	}
-
+func generateDefaultUsers(userRepo repositories.UserRepo) {
 	if users, err := userRepo.GetAll(); err != nil {
 		panic(err)
 	} else {
@@ -45,10 +40,10 @@ func generateDefaultUsers() {
 	}
 }
 
-func createDefaultRoutes() {
+func createDefaultRoutes(userRepo repositories.UserRepo) {
 	pingHandler := handlers.NewPing()
-	tokenHandler := handlers.NewToken()
-	userHandler := handlers.NewUser()
+	tokenHandler := handlers.NewToken(userRepo)
+	userHandler := handlers.NewUser(userRepo)
 
 	auth := security.NewAuthentication()
 
@@ -67,11 +62,21 @@ func addMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler
 func main() {
 	log.Print("Quest server starting")
 
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
+	storageManager := repositories.NewStorageManager(redisClient)
+
+	userRepo := repositories.NewUserRepo(storageManager)
+
 	log.Print("Generating default users")
-	generateDefaultUsers()
+	generateDefaultUsers(userRepo)
 
 	log.Print("Creating routes")
-	createDefaultRoutes()
+	createDefaultRoutes(userRepo)
 
 	log.Print("Listening for connections on port 8080")
 
