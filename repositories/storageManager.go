@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
+// StorageManager defines interface
 type StorageManager interface {
 	Load(key string) (string, error)
 	Store(key string, data []byte) error
@@ -15,7 +16,7 @@ type storageManager struct {
 	redisClient *redis.Client
 }
 
-// NewUserRepo returns a new UserRepo instance
+// NewStorageManager returns a new UserRepo instance
 func NewStorageManager(rc *redis.Client) StorageManager {
 	return &storageManager{
 		redisClient: rc,

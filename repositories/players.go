@@ -14,6 +14,7 @@ func init() {
 	players = make(map[uint]*entities.Player)
 }
 
+// PlayerRepo defines interface
 type PlayerRepo interface {
 	GetAll() ([]entities.Player, error)
 	Get(id uint) (*entities.Player, error)
@@ -23,6 +24,7 @@ type PlayerRepo interface {
 type playerRepo struct {
 }
 
+// NewPlayerRepo returns new instance
 func NewPlayerRepo() PlayerRepo {
 	return &playerRepo{}
 }
