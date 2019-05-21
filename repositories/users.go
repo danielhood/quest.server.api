@@ -12,7 +12,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
-var users map[uint]*entities.User
+var users []entities.User
 
 var redisClient *redis.Client
 
@@ -24,14 +24,15 @@ func init() {
 	})
 
 	// Default strucutre
-	users = make(map[uint]*entities.User)
+	users = make([]entities.User, 0)
 }
 
 type UserRepo interface {
 	GetAll() ([]entities.User, error)
-	Get(id uint) (*entities.User, error)
+	Get(ID uint) (*entities.User, error)
 	GetByUsername(username string) (*entities.User, error)
 	Add(o *entities.User) error
+	Delete(o *entities.User) error
 	Load() error
 	Store() error
 }
@@ -48,16 +49,18 @@ func (r *userRepo) GetAll() ([]entities.User, error) {
 
 	idx := 0
 	for _, value := range users {
-		allUsers[idx] = *value
+		allUsers[idx] = value
 		idx++
 	}
 
 	return allUsers, nil
 }
 
-func (r *userRepo) Get(id uint) (*entities.User, error) {
-	if val, ok := users[id]; ok {
-		return val, nil
+func (r *userRepo) Get(ID uint) (*entities.User, error) {
+	for _, u := range users {
+		if u.ID == ID {
+			return &u, nil
+		}
 	}
 
 	return nil, errors.New("User for id not found")
@@ -66,7 +69,7 @@ func (r *userRepo) Get(id uint) (*entities.User, error) {
 func (r *userRepo) GetByUsername(username string) (*entities.User, error) {
 	for _, u := range users {
 		if u.Username == username {
-			return u, nil
+			return &u, nil
 		}
 	}
 
@@ -81,10 +84,24 @@ func (r *userRepo) Add(u *entities.User) error {
 		// merge only online status for now
 		existing.IsOnline = u.IsOnline
 	} else {
-		users[u.ID] = u
+		users = append(users, *u)
 	}
 
 	return r.Store()
+}
+
+func (r *userRepo) Delete(u *entities.User) error {
+	log.Print("Delete User: ", u.Username)
+
+	for i, user := range users {
+		if user.ID == u.ID {
+			users[i] = users[len(users)-1]
+			users = users[:len(users)-1]
+			return r.Store()
+		}
+	}
+
+	return nil
 }
 
 // Store saves data to redis
@@ -116,6 +133,10 @@ func (r *userRepo) Load() error {
 		return err
 	}
 	fmt.Println("usersJson", userJSON)
+
+	if len(userJSON) == 0 {
+		return nil
+	}
 
 	if err = json.Unmarshal([]byte(userJSON), &users); err != nil {
 		return err

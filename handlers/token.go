@@ -21,7 +21,7 @@ type Token struct {
 // Device Tokens can be requested by a registered hostname/devicekey pair.
 type TokenRequest struct {
 	Username  string `json:"username"`
-	Password  string `json:"passowrd"`
+	Password  string `json:"password"`
 	Hostname  string `json:"hostname"`
 	DeviceKey string `json:"devicekey"`
 }
@@ -40,7 +40,7 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	case "GET":
 		log.Print("/token:GET")
 
-		log.Print("GET params were:", req.URL.Query())
+		//log.Print("GET params were:", req.URL.Query())
 
 		requestBody, err := ioutil.ReadAll(req.Body)
 		defer req.Body.Close()
@@ -54,7 +54,7 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		log.Print("GET body was:", requestBody, " Length: ", len(requestBody))
+		//log.Print("GET body was:", requestBody, " Length: ", len(requestBody))
 
 		var tokenRequest TokenRequest
 		if err = json.Unmarshal(requestBody, &tokenRequest); err != nil {
@@ -74,6 +74,8 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (t *Token) processUserLogin(w http.ResponseWriter, tokenRequest TokenRequest) {
+	log.Print("Request User: ", tokenRequest.Username)
+
 	user, err := t.userRepo.GetByUsername(tokenRequest.Username)
 	if err != nil {
 		http.Error(w, "Failed to verify user credentials", http.StatusInternalServerError)
@@ -94,5 +96,7 @@ func (t *Token) processUserLogin(w http.ResponseWriter, tokenRequest TokenReques
 }
 
 func (t *Token) processDeviceLogin(w http.ResponseWriter, tokenRequest TokenRequest) {
+	log.Print("Request Hostname: ", tokenRequest.Hostname, " DeviceKey: ", tokenRequest.DeviceKey)
+
 	http.Error(w, "Device login not supported", http.StatusInternalServerError)
 }

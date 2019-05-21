@@ -10,6 +10,7 @@ type UserService interface {
 	Create(*entities.User) error
 	Read(uint) (*entities.User, error)
 	Update(*entities.User) error
+	Delete(*entities.User) error
 }
 
 // NewUserService creates a new UserService
@@ -35,4 +36,6 @@ func (s *userService) Update(u *entities.User) error {
 	return s.userRepo.Add(u)
 }
 
-// TODO: Delete
+func (s *userService) Delete(u *entities.User) error {
+	return s.userRepo.Delete(u)
+}
