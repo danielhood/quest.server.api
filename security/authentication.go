@@ -1,27 +1,34 @@
 package security
 
 import (
-  "fmt"
-  "net/http"
-  "strings"
+	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 type Authentication struct {
-  encryptionKey []byte
+	encryptionKey []byte
+}
+
+type QuestClaims struct {
+	IsAdmin  bool   `json:"isadmin"`
+	AuthType string `json:"authtype"`
+	jwt.StandardClaims
 }
 
 func NewAuthentication() *Authentication {
 
-  return &Authentication{
-    encryptionKey: []byte("abxx002151!"),
-  }
+	return &Authentication{
+		encryptionKey: []byte("abxx002151!"),
+	}
 }
 
 func (a *Authentication) Authenticate(next http.Handler) http.Handler {
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    var token string
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var token string
 
 		// Get token from the Authorization header
 		// format: Authorization: Bearer <token>
@@ -39,7 +46,7 @@ func (a *Authentication) Authenticate(next http.Handler) http.Handler {
 		}
 
 		// Now parse the token
-		parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		parsedToken, err := jwt.ParseWithClaims(token, &QuestClaims{}, func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				msg := fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -52,16 +59,20 @@ func (a *Authentication) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-    // Check token is valid
-    		if parsedToken != nil && parsedToken.Valid {
-    			// Everything worked! Set the user in the context.
-          fmt.Println("User authenticated")
-    			next.ServeHTTP(w, r)
-          return
-    		}
+		// Check token is valid
+		if claims, ok := parsedToken.Claims.(*QuestClaims); ok && parsedToken != nil && parsedToken.Valid {
 
-    		// Token is invalid
-    		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-    		return
-  })
+			// Everything worked! Set the user in the context.
+			fmt.Println("User authenticated")
+			// TODO: "user" or "device", pull from token
+			r.Header.Add("QUEST_AUTH_TYPE", claims.AuthType)
+			r.Header.Add("QUEST_IS_ADMIN", strconv.FormatBool(claims.IsAdmin)) // "true"/"false"
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		// Token is invalid
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	})
 }

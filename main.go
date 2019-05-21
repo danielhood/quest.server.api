@@ -48,13 +48,22 @@ func generateDefaultUsers() {
 func createDefaultRoutes() {
 	pingHandler := handlers.NewPing()
 	tokenHandler := handlers.NewToken()
+	userHandler := handlers.NewUser()
 	objectHandler := handlers.NewObject()
 
 	auth := security.NewAuthentication()
 
 	http.Handle("/ping", pingHandler)
 	http.Handle("/token", tokenHandler)
-	http.Handle("/object", AddMiddleware(objectHandler, auth.Authenticate))
+	http.Handle("/user", addMiddleware(userHandler, auth.Authenticate))
+	http.Handle("/object", addMiddleware(objectHandler, auth.Authenticate))
+}
+
+func addMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
+	for _, mw := range middleware {
+		h = mw(h)
+	}
+	return h
 }
 
 func main() {
@@ -77,11 +86,4 @@ func main() {
 	log.Fatal(http.ListenAndServeTLS(":8080", certPath, keyPath, nil))
 
 	log.Print("Terminating")
-}
-
-func AddMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
-	for _, mw := range middleware {
-		h = mw(h)
-	}
-	return h
 }

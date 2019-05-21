@@ -26,8 +26,8 @@ type tokenService struct {
 }
 
 type UserClaims struct {
-	Admin bool          `json:"admin"`
-	User  entities.User `json:"user"`
+	IsAdmin  bool   `json:"isadmin"`
+	AuthType string `json:"authtype"`
 	jwt.StandardClaims
 }
 
@@ -42,7 +42,7 @@ func (s *tokenService) Get(u *entities.User) (string, error) {
 	// Set token claims
 	claims := UserClaims{
 		u.HasRole("AdministratorRole"),
-		*u,
+		"user",
 		jwt.StandardClaims{
 			Id:        strconv.Itoa((int)(u.ID)),
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),

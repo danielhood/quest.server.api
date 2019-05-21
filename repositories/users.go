@@ -27,6 +27,7 @@ func init() {
 	users = make([]entities.User, 0)
 }
 
+// UserRepo defines UserRepo interface
 type UserRepo interface {
 	GetAll() ([]entities.User, error)
 	Get(ID uint) (*entities.User, error)
@@ -40,6 +41,7 @@ type UserRepo interface {
 type userRepo struct {
 }
 
+// NewUserRepo returns a new UserRepo instance
 func NewUserRepo() UserRepo {
 	return &userRepo{}
 }
@@ -82,6 +84,7 @@ func (r *userRepo) Add(u *entities.User) error {
 	existing, _ := r.Get(u.ID)
 	if existing != nil {
 		// merge only online status for now
+		// TODO: pull out password into a separate strucutre, and hash it
 		existing.IsOnline = u.IsOnline
 	} else {
 		users = append(users, *u)
