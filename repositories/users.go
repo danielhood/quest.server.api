@@ -30,6 +30,7 @@ func init() {
 type UserRepo interface {
 	GetAll() ([]entities.User, error)
 	Get(id uint) (*entities.User, error)
+	GetByUsername(username string) (*entities.User, error)
 	Add(o *entities.User) error
 	Load() error
 	Store() error
@@ -60,6 +61,16 @@ func (r *userRepo) Get(id uint) (*entities.User, error) {
 	}
 
 	return nil, errors.New("User for id not found")
+}
+
+func (r *userRepo) GetByUsername(username string) (*entities.User, error) {
+	for _, u := range users {
+		if u.Username == username {
+			return u, nil
+		}
+	}
+
+	return nil, errors.New("User for username not found")
 }
 
 func (r *userRepo) Add(u *entities.User) error {

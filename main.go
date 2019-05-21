@@ -58,9 +58,9 @@ func createDefaultRoutes() {
 }
 
 func main() {
-	log.Print("Loco server starting")
+	log.Print("Quest server starting")
 
-	log.Print("Generating defualt users")
+	log.Print("Generating default users")
 	generateDefaultUsers()
 
 	log.Print("Creating routes")
