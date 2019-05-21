@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/services"
 )
@@ -87,9 +88,9 @@ func (t *Token) processUserLogin(w http.ResponseWriter, tokenRequest TokenReques
 		return
 	}
 
-	token, err := t.Service.Get(user)
+	token, err := t.Service.GetUserToken(user)
 	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		http.Error(w, "Failed to generate user token", http.StatusInternalServerError)
 		return
 	}
 	w.Write([]byte(token))
@@ -98,5 +99,20 @@ func (t *Token) processUserLogin(w http.ResponseWriter, tokenRequest TokenReques
 func (t *Token) processDeviceLogin(w http.ResponseWriter, tokenRequest TokenRequest) {
 	log.Print("Request Hostname: ", tokenRequest.Hostname, " DeviceKey: ", tokenRequest.DeviceKey)
 
-	http.Error(w, "Device login not supported", http.StatusInternalServerError)
+	// TODO: Validate registered device
+
+	device := entities.Device{
+		ID:         1,
+		Hostname:   tokenRequest.Hostname,
+		Registered: true,
+		Key:        tokenRequest.DeviceKey,
+		IsEnabled:  true,
+	}
+
+	token, err := t.Service.GetDeviceToken(&device)
+	if err != nil {
+		http.Error(w, "Failed to generate device token", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(token))
 }

@@ -19,7 +19,8 @@ type Token string
 
 // TokenService provides a token
 type TokenService interface {
-	Get(u *entities.User) (string, error)
+	GetUserToken(u *entities.User) (string, error)
+	GetDeviceToken(d *entities.Device) (string, error)
 }
 
 type tokenService struct {
@@ -36,9 +37,8 @@ func NewTokenService() TokenService {
 	return &tokenService{}
 }
 
-// Get retrieves a token for a user
-// TODO: Take user credentials and verify them against what's in database
-func (s *tokenService) Get(u *entities.User) (string, error) {
+// GetUserToken retrieves a token for a user
+func (s *tokenService) GetUserToken(u *entities.User) (string, error) {
 	// Set token claims
 	claims := UserClaims{
 		u.HasRole("AdministratorRole"),
@@ -59,7 +59,42 @@ func (s *tokenService) Get(u *entities.User) (string, error) {
 		return "", errors.New("Failed to sign token")
 	}
 
-	fmt.Printf("Generated Token for %v %v: %v", u.FirstName, u.LastName, tokenString)
+	fmt.Printf("Generated User Token for %v %v: %v", u.FirstName, u.LastName, tokenString)
+
+	return tokenString, nil
+}
+
+// GetDeviceToken retrieves a token for a device
+func (s *tokenService) GetDeviceToken(d *entities.Device) (string, error) {
+	// Set token claims
+	claims := UserClaims{
+		false,
+		"device",
+		jwt.StandardClaims{
+			Id:        strconv.Itoa((int)(d.ID)),
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			Issuer:    "token-service",
+		},
+	}
+
+	tokenString, err := s.createToken(claims)
+
+	if err == nil {
+		fmt.Printf("Generated Device Token for %v %v: %v", d.Hostname, d.Key, tokenString)
+	}
+
+	return tokenString, err
+}
+
+func (s *tokenService) createToken(claims UserClaims) (string, error) {
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Sign token with key
+	tokenString, err := token.SignedString(mySigningKey)
+	if err != nil {
+		return "", errors.New("Failed to sign token")
+	}
 
 	return tokenString, nil
 }
