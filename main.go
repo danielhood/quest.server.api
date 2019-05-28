@@ -78,15 +78,19 @@ func main() {
 	log.Print("Creating routes")
 	createDefaultRoutes(userRepo)
 
-	log.Print("Listening for connections on port 8080")
-
 	// openssl genrsa -out server.key 2048
 	certPath := "server.pem"
 
 	// openssl req -new -x509 -sha256 -key server.key -out server.pem -days 3650
 	keyPath := "server.key"
 
-	log.Fatal(http.ListenAndServeTLS(":8080", certPath, keyPath, nil))
+	if _, err := os.Stat(keyPath); err == nil {
+		log.Print("Listening for connections on HTTPS port 8443")
+		log.Fatal(http.ListenAndServeTLS(":8443", certPath, keyPath, nil))
+	} else if os.IsNotExist(err) {
+		log.Print("Listening for connections on HTTP port 8080")
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}
 
 	log.Print("Terminating")
 }
