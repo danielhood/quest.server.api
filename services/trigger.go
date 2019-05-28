@@ -25,5 +25,7 @@ type triggerService struct {
 
 func (s *triggerService) Trigger(p *entities.Player, d *entities.Device) (string, error) {
 	// TODO: Process game state for user and return device action code
-	return "SUCCESS", nil
+
+	// Valid action codes are: NONE, UNKNOWN_PLAYER, NO_QUEST, COMPLETED, ACTIVATE
+	return "ACTIVATE", nil
 }
