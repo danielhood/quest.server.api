@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/handlers"
