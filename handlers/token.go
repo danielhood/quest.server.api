@@ -66,7 +66,7 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if err != nil {
-			http.Error(w, "Failed to verify user credentials", http.StatusInternalServerError)
+			http.Error(w, "Failed to verify user credentials", http.StatusUnauthorized)
 			return
 		}
 
