@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/services"
 )
@@ -47,6 +48,19 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		deviceBytes, _ := json.Marshal(device)
 		w.Write(deviceBytes)
 
+	case "PUT":
+		log.Print("/object:PUT")
+
+		var device = h.parsePutRequest(w, req)
+
+		if device == nil {
+			return
+		}
+
+		_ = h.svc.Update(device)
+		deviceBytes, _ := json.Marshal(device)
+		w.Write(deviceBytes)
+
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
@@ -83,4 +97,37 @@ func (h *Device) parseGetRequest(w http.ResponseWriter, req *http.Request) *Devi
 	}
 
 	return &deviceGetRequest
+}
+
+func (h *Device) parsePutRequest(w http.ResponseWriter, req *http.Request) *entities.Device {
+	requestBody, err := ioutil.ReadAll(req.Body)
+	defer req.Body.Close()
+
+	if err != nil {
+		http.Error(w, "Unable to parse request body", http.StatusInternalServerError)
+		return nil
+	}
+
+	if len(requestBody) == 0 {
+		http.Error(w, "Empty Device passed", http.StatusInternalServerError)
+		return nil
+	}
+
+	var device entities.Device
+	if err = json.Unmarshal(requestBody, &device); err != nil {
+		http.Error(w, "Unable to parse Device json", http.StatusInternalServerError)
+		return nil
+	}
+
+	if len(device.Hostname) == 0 {
+		http.Error(w, "Hostname not specified", http.StatusInternalServerError)
+		return nil
+	}
+
+	if len(device.DeviceKey) == 0 {
+		http.Error(w, "DeviceKey not specified", http.StatusInternalServerError)
+		return nil
+	}
+
+	return &device
 }

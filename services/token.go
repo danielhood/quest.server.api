@@ -71,8 +71,8 @@ func (s *tokenService) ProcessDeviceLogin(hostname string, deviceKey string) (st
 
 		newDevice := entities.Device{
 			Hostname:     hostname,
+			DeviceKey:    deviceKey,
 			IsRegistered: false,
-			Key:          deviceKey,
 			IsEnabled:    false,
 		}
 
@@ -124,7 +124,7 @@ func (s *tokenService) getDeviceToken(d *entities.Device) (string, error) {
 		false,
 		"device",
 		jwt.StandardClaims{
-			Id:        d.Hostname + ":" + d.Key,
+			Id:        d.Hostname + ":" + d.DeviceKey,
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Issuer:    "token-service",
 		},
@@ -133,7 +133,7 @@ func (s *tokenService) getDeviceToken(d *entities.Device) (string, error) {
 	tokenString, err := s.createToken(claims)
 
 	if err == nil {
-		fmt.Printf("Generated Device Token for %v %v: %v", d.Hostname, d.Key, tokenString)
+		fmt.Printf("Generated Device Token for %v %v: %v", d.Hostname, d.DeviceKey, tokenString)
 	}
 
 	return tokenString, err
