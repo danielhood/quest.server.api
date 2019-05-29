@@ -6,14 +6,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/services"
 )
 
 // Token contains strucutre of a token handler
 type Token struct {
-	Service  services.TokenService
+	svc      services.TokenService
 	userRepo repositories.UserRepo
 }
 
@@ -30,7 +29,7 @@ type TokenRequest struct {
 // NewToken creates new handler for tokens
 func NewToken(ur repositories.UserRepo) *Token {
 	return &Token{
-		Service:  services.NewTokenService(),
+		svc:      services.NewTokenService(ur),
 		userRepo: ur,
 	}
 }
@@ -40,8 +39,6 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		log.Print("/token:GET")
-
-		//log.Print("GET params were:", req.URL.Query())
 
 		requestBody, err := ioutil.ReadAll(req.Body)
 		defer req.Body.Close()
@@ -55,64 +52,27 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		//log.Print("GET body was:", requestBody, " Length: ", len(requestBody))
-
 		var tokenRequest TokenRequest
 		if err = json.Unmarshal(requestBody, &tokenRequest); err != nil {
 			http.Error(w, "Unable to parse token request json", http.StatusInternalServerError)
 			return
 		}
 
+		var token string
 		if len(tokenRequest.Username) > 0 {
-			t.processUserLogin(w, tokenRequest)
+			token, err = t.svc.ProcessUserLogin(tokenRequest.Username, tokenRequest.Password)
 		} else {
-			t.processDeviceLogin(w, tokenRequest)
+			token, err = t.svc.ProcessDeviceLogin(tokenRequest.Hostname, tokenRequest.DeviceKey)
 		}
+
+		if err != nil {
+			http.Error(w, "Failed to verify user credentials", http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte(token))
 
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
-}
-
-func (t *Token) processUserLogin(w http.ResponseWriter, tokenRequest TokenRequest) {
-	log.Print("Request User: ", tokenRequest.Username)
-
-	user, err := t.userRepo.GetByUsername(tokenRequest.Username)
-	if err != nil {
-		http.Error(w, "Failed to verify user credentials", http.StatusInternalServerError)
-		return
-	}
-
-	if tokenRequest.Password != user.Password {
-		http.Error(w, "Invalid password", http.StatusUnauthorized)
-		return
-	}
-
-	token, err := t.Service.GetUserToken(user)
-	if err != nil {
-		http.Error(w, "Failed to generate user token", http.StatusInternalServerError)
-		return
-	}
-	w.Write([]byte(token))
-}
-
-func (t *Token) processDeviceLogin(w http.ResponseWriter, tokenRequest TokenRequest) {
-	log.Print("Request Hostname: ", tokenRequest.Hostname, " DeviceKey: ", tokenRequest.DeviceKey)
-
-	// TODO: Validate registered device
-
-	device := entities.Device{
-		ID:         1,
-		Hostname:   tokenRequest.Hostname,
-		Registered: true,
-		Key:        tokenRequest.DeviceKey,
-		IsEnabled:  true,
-	}
-
-	token, err := t.Service.GetDeviceToken(&device)
-	if err != nil {
-		http.Error(w, "Failed to generate device token", http.StatusInternalServerError)
-		return
-	}
-	w.Write([]byte(token))
 }
