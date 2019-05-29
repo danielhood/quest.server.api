@@ -20,7 +20,6 @@ func init() {
 // DeviceRepo defines DeviceRepo interface
 type DeviceRepo interface {
 	GetAll() ([]entities.Device, error)
-	Get(ID uint) (*entities.Device, error)
 	GetByHostnameAndKey(hostname string, key string) (*entities.Device, error)
 	Add(o *entities.Device) error
 	Delete(o *entities.Device) error
@@ -53,16 +52,6 @@ func (r *deviceRepo) GetAll() ([]entities.Device, error) {
 	return allDevices, nil
 }
 
-func (r *deviceRepo) Get(ID uint) (*entities.Device, error) {
-	for _, d := range devices {
-		if d.ID == ID {
-			return &d, nil
-		}
-	}
-
-	return nil, errors.New("Device for id not found")
-}
-
 func (r *deviceRepo) GetByHostnameAndKey(hostname string, key string) (*entities.Device, error) {
 	for _, u := range devices {
 		if u.Hostname == hostname && u.Key == key {
@@ -76,10 +65,10 @@ func (r *deviceRepo) GetByHostnameAndKey(hostname string, key string) (*entities
 func (r *deviceRepo) Add(d *entities.Device) error {
 	log.Print("Add Device: ", d.Hostname, " Key: ", d.Key)
 
-	existing, _ := r.Get(d.ID)
+	existing, _ := r.GetByHostnameAndKey(d.Hostname, d.Key)
 	if existing != nil {
-		// merge only enabled status for now
 		existing.IsEnabled = d.IsEnabled
+		existing.IsRegistered = d.IsRegistered
 	} else {
 		devices = append(devices, *d)
 	}
@@ -91,7 +80,7 @@ func (r *deviceRepo) Delete(d *entities.Device) error {
 	log.Print("Delete Device: ", d.Hostname, " Key: ", d.Key)
 
 	for i, device := range devices {
-		if device.ID == d.ID {
+		if device.Hostname == d.Hostname && device.Key == d.Key {
 			devices[i] = devices[len(devices)-1]
 			devices = devices[:len(devices)-1]
 			return r.store()

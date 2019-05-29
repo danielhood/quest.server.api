@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,7 +25,8 @@ type TokenService interface {
 }
 
 type tokenService struct {
-	userRepo repositories.UserRepo
+	userRepo   repositories.UserRepo
+	deviceRepo repositories.DeviceRepo
 }
 
 type userClaims struct {
@@ -36,9 +36,10 @@ type userClaims struct {
 }
 
 // NewTokenService creates a new UserService
-func NewTokenService(userRepo repositories.UserRepo) TokenService {
+func NewTokenService(ur repositories.UserRepo, dr repositories.DeviceRepo) TokenService {
 	return &tokenService{
-		userRepo: userRepo,
+		userRepo:   ur,
+		deviceRepo: dr,
 	}
 }
 
@@ -62,17 +63,31 @@ func (s *tokenService) ProcessUserLogin(username string, password string) (strin
 func (s *tokenService) ProcessDeviceLogin(hostname string, deviceKey string) (string, error) {
 	log.Print("Request Hostname: ", hostname, " DeviceKey: ", deviceKey)
 
-	// TODO: Validate registered device
+	device, err := s.deviceRepo.GetByHostnameAndKey(hostname, deviceKey)
 
-	device := entities.Device{
-		ID:         1,
-		Hostname:   hostname,
-		Registered: true,
-		Key:        deviceKey,
-		IsEnabled:  true,
+	if err != nil {
+		// Device doesn't exist yet
+		log.Print("Registering new device")
+
+		newDevice := entities.Device{
+			Hostname:     hostname,
+			IsRegistered: false,
+			Key:          deviceKey,
+			IsEnabled:    false,
+		}
+
+		s.deviceRepo.Add(&newDevice)
+
+		return "", err
 	}
 
-	return s.getDeviceToken(&device)
+	// Check if registered
+	if device.IsRegistered {
+		return s.getDeviceToken(device)
+	}
+
+	// Device exists, but not registered, so return no token
+	return "", errors.New("Device not registered")
 }
 
 // GetUserToken retrieves a token for a user
@@ -82,7 +97,7 @@ func (s *tokenService) getUserToken(u *entities.User) (string, error) {
 		u.HasRole("AdministratorRole"),
 		"user",
 		jwt.StandardClaims{
-			Id:        strconv.Itoa((int)(u.ID)),
+			Id:        u.Username,
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Issuer:    "token-service",
 		},
@@ -109,7 +124,7 @@ func (s *tokenService) getDeviceToken(d *entities.Device) (string, error) {
 		false,
 		"device",
 		jwt.StandardClaims{
-			Id:        strconv.Itoa((int)(d.ID)),
+			Id:        d.Hostname + ":" + d.Key,
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 			Issuer:    "token-service",
 		},

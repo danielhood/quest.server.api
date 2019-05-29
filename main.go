@@ -19,7 +19,6 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 		if len(users) == 0 {
 			// Initialize default users if no users currently exist
 			userRepo.Add(&entities.User{
-				ID:        1,
 				Username:  "admin",
 				Password:  "admin",
 				FirstName: "Admin",
@@ -29,7 +28,6 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 			})
 
 			userRepo.Add(&entities.User{
-				ID:        2,
 				Username:  "test",
 				Password:  "test",
 				FirstName: "Test",
@@ -43,7 +41,7 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 
 func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories.PlayerRepo, deviceRepo repositories.DeviceRepo) {
 	pingHandler := handlers.NewPing()
-	tokenHandler := handlers.NewToken(userRepo)
+	tokenHandler := handlers.NewToken(userRepo, deviceRepo)
 	userHandler := handlers.NewUser(userRepo)
 	triggerHandler := handlers.NewTrigger(playerRepo, deviceRepo)
 
@@ -74,7 +72,7 @@ func main() {
 	storageManager := repositories.NewStorageManager(redisClient)
 
 	userRepo := repositories.NewUserRepo(storageManager)
-	playerRepo := repositories.NewPlayerRepo()
+	playerRepo := repositories.NewPlayerRepo(storageManager)
 	deviceRepo := repositories.NewDeviceRepo(storageManager)
 
 	log.Print("Generating default users")

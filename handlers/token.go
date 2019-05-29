@@ -27,9 +27,9 @@ type TokenRequest struct {
 }
 
 // NewToken creates new handler for tokens
-func NewToken(ur repositories.UserRepo) *Token {
+func NewToken(ur repositories.UserRepo, dr repositories.DeviceRepo) *Token {
 	return &Token{
-		svc:      services.NewTokenService(ur),
+		svc:      services.NewTokenService(ur, dr),
 		userRepo: ur,
 	}
 }

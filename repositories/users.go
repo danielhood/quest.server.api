@@ -20,7 +20,6 @@ func init() {
 // UserRepo defines UserRepo interface
 type UserRepo interface {
 	GetAll() ([]entities.User, error)
-	Get(ID uint) (*entities.User, error)
 	GetByUsername(username string) (*entities.User, error)
 	Add(o *entities.User) error
 	Delete(o *entities.User) error
@@ -53,16 +52,6 @@ func (r *userRepo) GetAll() ([]entities.User, error) {
 	return allUsers, nil
 }
 
-func (r *userRepo) Get(ID uint) (*entities.User, error) {
-	for _, u := range users {
-		if u.ID == ID {
-			return &u, nil
-		}
-	}
-
-	return nil, errors.New("User for id not found")
-}
-
 func (r *userRepo) GetByUsername(username string) (*entities.User, error) {
 	for _, u := range users {
 		if u.Username == username {
@@ -76,11 +65,15 @@ func (r *userRepo) GetByUsername(username string) (*entities.User, error) {
 func (r *userRepo) Add(u *entities.User) error {
 	log.Print("Add User: ", u.Username)
 
-	existing, _ := r.Get(u.ID)
+	existing, _ := r.GetByUsername(u.Username)
 	if existing != nil {
-		// merge only online status for now
 		// TODO: pull out password into a separate strucutre, and hash it
 		existing.IsOnline = u.IsOnline
+		existing.FirstName = u.FirstName
+		existing.IsEnabled = u.IsEnabled
+		existing.LastName = u.LastName
+		existing.Password = u.Password
+		existing.Roles = u.Roles
 	} else {
 		users = append(users, *u)
 	}
@@ -92,7 +85,7 @@ func (r *userRepo) Delete(u *entities.User) error {
 	log.Print("Delete User: ", u.Username)
 
 	for i, user := range users {
-		if user.ID == u.ID {
+		if user.Username == u.Username {
 			users[i] = users[len(users)-1]
 			users = users[:len(users)-1]
 			return r.store()
