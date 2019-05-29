@@ -43,26 +43,29 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		requestBody, err := ioutil.ReadAll(req.Body)
 		defer req.Body.Close()
 		if err != nil {
-			http.Error(w, "Unable to parse request body", http.StatusInternalServerError)
+			http.Error(w, "Unable to parse request body", http.StatusUnauthorized)
 			return
 		}
 
 		if len(requestBody) == 0 {
-			http.Error(w, "Empty TokenRequest passed", http.StatusInternalServerError)
+			http.Error(w, "Empty TokenRequest passed", http.StatusUnauthorized)
 			return
 		}
 
 		var tokenRequest TokenRequest
 		if err = json.Unmarshal(requestBody, &tokenRequest); err != nil {
-			http.Error(w, "Unable to parse token request json", http.StatusInternalServerError)
+			http.Error(w, "Unable to parse token request json", http.StatusUnauthorized)
 			return
 		}
 
 		var token string
 		if len(tokenRequest.Username) > 0 {
 			token, err = t.svc.ProcessUserLogin(tokenRequest.Username, tokenRequest.Password)
-		} else {
+		} else if len(tokenRequest.Hostname) > 0 && len(tokenRequest.DeviceKey) > 0 {
 			token, err = t.svc.ProcessDeviceLogin(tokenRequest.Hostname, tokenRequest.DeviceKey)
+		} else {
+			http.Error(w, "Invalid request body: missing requierd keys", http.StatusUnauthorized)
+			return
 		}
 
 		if err != nil {

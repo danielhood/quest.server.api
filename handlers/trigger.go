@@ -63,6 +63,7 @@ func (h *Trigger) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func (h *Trigger) parseRequest(w http.ResponseWriter, req *http.Request) *TriggerRequest {
 	requestBody, err := ioutil.ReadAll(req.Body)
 	defer req.Body.Close()
+
 	if err != nil {
 		http.Error(w, "Unable to parse request body", http.StatusInternalServerError)
 		return nil
