@@ -41,7 +41,7 @@ func NewDeviceRepo(sm StorageManager) DeviceRepo {
 }
 
 func (r *deviceRepo) GetAll() ([]entities.Device, error) {
-	allDevices := make([]entities.Device, len(users))
+	allDevices := make([]entities.Device, len(devices))
 
 	idx := 0
 	for _, value := range devices {
@@ -53,9 +53,9 @@ func (r *deviceRepo) GetAll() ([]entities.Device, error) {
 }
 
 func (r *deviceRepo) GetByHostnameAndKey(hostname string, deviceKey string) (*entities.Device, error) {
-	for _, u := range devices {
+	for i, u := range devices {
 		if u.Hostname == hostname && u.DeviceKey == deviceKey {
-			return &u, nil
+			return &devices[i], nil
 		}
 	}
 

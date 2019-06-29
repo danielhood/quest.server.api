@@ -44,8 +44,15 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		device, _ := h.svc.Read(deviceGetRequest.Hostname, deviceGetRequest.DeviceKey)
-		deviceBytes, _ := json.Marshal(device)
+		var deviceBytes []byte
+		if len(deviceGetRequest.Hostname) == 0 {
+			deviceList, _ := h.svc.ReadAll()
+			deviceBytes, _ = json.Marshal(deviceList)
+		} else {
+			device, _ := h.svc.Read(deviceGetRequest.Hostname, deviceGetRequest.DeviceKey)
+			deviceBytes, _ = json.Marshal(device)
+		}
+
 		w.Write(deviceBytes)
 
 	case "PUT":
@@ -76,8 +83,7 @@ func (h *Device) parseGetRequest(w http.ResponseWriter, req *http.Request) *Devi
 	}
 
 	if len(requestBody) == 0 {
-		http.Error(w, "Empty DeviceGetRequest passed", http.StatusInternalServerError)
-		return nil
+		return &DeviceGetRequest{}
 	}
 
 	var deviceGetRequest DeviceGetRequest

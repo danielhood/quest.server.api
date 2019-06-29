@@ -7,6 +7,7 @@ import (
 
 // DeviceService provides a CRUD interface for Devices
 type DeviceService interface {
+	ReadAll() ([]entities.Device, error)
 	Read(string, string) (*entities.Device, error)
 	Update(*entities.Device) error
 	Delete(*entities.Device) error
@@ -21,6 +22,10 @@ func NewDeviceService(dr repositories.DeviceRepo) DeviceService {
 
 type deviceService struct {
 	deviceRepo repositories.DeviceRepo
+}
+
+func (s *deviceService) ReadAll() ([]entities.Device, error) {
+	return s.deviceRepo.GetAll()
 }
 
 func (s *deviceService) Read(hostname string, deviceKey string) (*entities.Device, error) {

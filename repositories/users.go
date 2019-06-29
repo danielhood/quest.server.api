@@ -53,9 +53,9 @@ func (r *userRepo) GetAll() ([]entities.User, error) {
 }
 
 func (r *userRepo) GetByUsername(username string) (*entities.User, error) {
-	for _, u := range users {
+	for i, u := range users {
 		if u.Username == username {
-			return &u, nil
+			return &users[i], nil
 		}
 	}
 

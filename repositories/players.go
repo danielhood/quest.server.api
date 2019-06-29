@@ -50,9 +50,9 @@ func (r *playerRepo) GetAll() ([]entities.Player, error) {
 }
 
 func (r *playerRepo) GetByCode(code string) (*entities.Player, error) {
-	for _, p := range players {
+	for i, p := range players {
 		if p.Code == code {
-			return &p, nil
+			return &players[i], nil
 		}
 	}
 
