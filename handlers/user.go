@@ -41,7 +41,12 @@ func (h *User) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			usersBytes, _ := json.Marshal(users)
 			w.Write(usersBytes)
 		} else {
-			user, _ := h.svc.Read(username)
+			user, err := h.svc.Read(username)
+			if err != nil {
+				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+				return
+			}
+
 			userBytes, _ := json.Marshal(user)
 			w.Write(userBytes)
 		}

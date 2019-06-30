@@ -43,6 +43,7 @@ func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories
 	pingHandler := handlers.NewPing()
 	tokenHandler := handlers.NewToken(userRepo, deviceRepo)
 	userHandler := handlers.NewUser(userRepo)
+	playerHandler := handlers.NewPlayer(playerRepo)
 	triggerHandler := handlers.NewTrigger(playerRepo, deviceRepo)
 	deviceHandler := handlers.NewDevice(deviceRepo)
 
@@ -51,6 +52,7 @@ func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories
 	http.Handle("/ping", pingHandler)
 	http.Handle("/token", tokenHandler)
 	http.Handle("/user", addMiddleware(userHandler, auth.Authenticate))
+	http.Handle("/player", addMiddleware(playerHandler, auth.Authenticate))
 	http.Handle("/trigger", addMiddleware(triggerHandler, auth.Authenticate))
 	http.Handle("/device", addMiddleware(deviceHandler, auth.Authenticate))
 }

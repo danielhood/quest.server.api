@@ -49,7 +49,12 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			deviceList, _ := h.svc.ReadAll()
 			deviceBytes, _ = json.Marshal(deviceList)
 		} else {
-			device, _ := h.svc.Read(deviceGetRequest.Hostname, deviceGetRequest.DeviceKey)
+			device, err := h.svc.Read(deviceGetRequest.Hostname, deviceGetRequest.DeviceKey)
+			if err != nil {
+				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+				return
+			}
+
 			deviceBytes, _ = json.Marshal(device)
 		}
 

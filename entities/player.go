@@ -4,7 +4,7 @@ package entities
 type Player struct {
 	Code         string `json:"code"`
 	Name         string `json:"name"`
-	QuestID      uint   `json:"questid"`
+	QuestKey     uint   `json:"questkey"`
 	QuestState   string `josn:"queststate"`
 	Achievements string `json:"achievements"`
 	Isnabled     bool   `json:"isenabled"`

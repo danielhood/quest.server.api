@@ -20,6 +20,7 @@ type PlayerRepo interface {
 	GetAll() ([]entities.Player, error)
 	GetByCode(code string) (*entities.Player, error)
 	Add(o *entities.Player) error
+	Delete(o *entities.Player) error
 }
 
 type playerRepo struct {
@@ -66,7 +67,7 @@ func (r *playerRepo) Add(p *entities.Player) error {
 	if existing != nil {
 		// merge
 		existing.Name = p.Name
-		existing.QuestID = p.QuestID
+		existing.QuestKey = p.QuestKey
 		existing.QuestState = p.QuestState
 		existing.Achievements = p.Achievements
 		existing.Isnabled = p.Isnabled
@@ -75,6 +76,20 @@ func (r *playerRepo) Add(p *entities.Player) error {
 	}
 
 	return r.store()
+}
+
+func (r *playerRepo) Delete(p *entities.Player) error {
+	log.Print("Delete Player: ", p.Code)
+
+	for i, player := range players {
+		if player.Code == p.Code {
+			players[i] = players[len(players)-1]
+			players = players[:len(players)-1]
+			return r.store()
+		}
+	}
+
+	return nil
 }
 
 // Store saves data to redis
