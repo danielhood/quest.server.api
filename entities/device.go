@@ -6,4 +6,5 @@ type Device struct {
 	DeviceKey    string `json:"devicekey"`
 	IsRegistered bool   `json:"isregistered"`
 	IsEnabled    bool   `json:"isenabled"`
+	DeviceType   string `json:"devicetype"`
 }

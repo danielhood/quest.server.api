@@ -69,6 +69,7 @@ func (r *deviceRepo) Add(d *entities.Device) error {
 	if existing != nil {
 		existing.IsEnabled = d.IsEnabled
 		existing.IsRegistered = d.IsRegistered
+		existing.DeviceType = d.DeviceType
 	} else {
 		devices = append(devices, *d)
 	}
