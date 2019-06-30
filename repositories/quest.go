@@ -105,15 +105,11 @@ func (r *questRepo) store() error {
 
 // Load retrieves data from redis
 func (r *questRepo) load() error {
-	log.Print("Loading quests")
-
 	questsJSON, err := r.storageManager.Load("quests")
 
 	if err != nil {
 		return err
 	}
-
-	log.Print("questsJSON", questsJSON)
 
 	if len(questsJSON) == 0 {
 		return nil
@@ -122,6 +118,8 @@ func (r *questRepo) load() error {
 	if err = json.Unmarshal([]byte(questsJSON), &quests); err != nil {
 		return err
 	}
+
+	log.Printf("Loaded %v quest(s)", len(quests))
 
 	return nil
 }

@@ -106,15 +106,11 @@ func (r *playerRepo) store() error {
 
 // Load retrieves data from redis
 func (r *playerRepo) load() error {
-	log.Print("Loading players")
-
 	playersJSON, err := r.storageManager.Load("players")
 
 	if err != nil {
 		return err
 	}
-
-	log.Print("playersJSON", playersJSON)
 
 	if len(playersJSON) == 0 {
 		return nil
@@ -123,6 +119,8 @@ func (r *playerRepo) load() error {
 	if err = json.Unmarshal([]byte(playersJSON), &players); err != nil {
 		return err
 	}
+
+	log.Printf("Loaded %v player(s)", len(players))
 
 	return nil
 }

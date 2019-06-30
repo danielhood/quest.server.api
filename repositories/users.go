@@ -108,15 +108,11 @@ func (r *userRepo) store() error {
 
 // Load retrieves data from redis
 func (r *userRepo) load() error {
-	log.Print("Loading users")
-
 	userJSON, err := r.storageManager.Load("users")
 
 	if err != nil {
 		return err
 	}
-
-	log.Print("usersJson", userJSON)
 
 	if len(userJSON) == 0 {
 		return nil
@@ -125,6 +121,8 @@ func (r *userRepo) load() error {
 	if err = json.Unmarshal([]byte(userJSON), &users); err != nil {
 		return err
 	}
+
+	log.Printf("Loaded %v user(s)", len(users))
 
 	return nil
 }

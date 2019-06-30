@@ -13,6 +13,7 @@ import (
 )
 
 func generateDefaultUsers(userRepo repositories.UserRepo) {
+	log.Print("Generating default users")
 	if users, err := userRepo.GetAll(); err != nil {
 		panic(err)
 	} else {
@@ -34,6 +35,22 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 				LastName:  "User",
 				Roles:     []string{},
 				IsOnline:  false,
+			})
+		}
+	}
+}
+
+func generateDefaultQuests(questRepo repositories.QuestRepo) {
+	log.Print("Generating default quests")
+	if quests, err := questRepo.GetAll(); err != nil {
+		panic(err)
+	} else {
+		if len(quests) == 0 {
+			questRepo.Add(&entities.Quest{
+				Key:       "FIND_ALL_TREASURES",
+				Name:      "Find All Treasures",
+				Desc:      "Find all treasures in the kingdom",
+				IsEnabled: true,
 			})
 		}
 	}
@@ -82,8 +99,8 @@ func main() {
 	deviceRepo := repositories.NewDeviceRepo(storageManager)
 	questRepo := repositories.NewQuestRepo(storageManager)
 
-	log.Print("Generating default users")
 	generateDefaultUsers(userRepo)
+	generateDefaultQuests(questRepo)
 
 	log.Print("Creating routes")
 	createDefaultRoutes(userRepo, playerRepo, deviceRepo, questRepo)

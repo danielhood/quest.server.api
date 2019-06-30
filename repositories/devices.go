@@ -105,15 +105,11 @@ func (r *deviceRepo) store() error {
 
 // Load retrieves data from redis
 func (r *deviceRepo) load() error {
-	log.Print("Loading devices")
-
 	devicesJSON, err := r.storageManager.Load("devices")
 
 	if err != nil {
 		return err
 	}
-
-	log.Print("devicesJSON", devicesJSON)
 
 	if len(devicesJSON) == 0 {
 		return nil
@@ -122,6 +118,8 @@ func (r *deviceRepo) load() error {
 	if err = json.Unmarshal([]byte(devicesJSON), &devices); err != nil {
 		return err
 	}
+
+	log.Printf("Loaded %v device(s)", len(devices))
 
 	return nil
 }

@@ -1,6 +1,6 @@
 package entities
 
-// Device defines a user for our application
+// Device defines a device for our application
 type Device struct {
 	Hostname     string `json:"hostname"`
 	DeviceKey    string `json:"devicekey"`

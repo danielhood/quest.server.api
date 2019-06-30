@@ -92,6 +92,25 @@ func (h *Quest) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		questBytes, _ := json.Marshal(quest)
 		w.Write(questBytes)
 
+	case "DELETE":
+
+		// Quest DELETE requires user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		log.Print("/quest:DELETE")
+
+		var quest = h.parsePutRequest(w, req)
+
+		if quest == nil {
+			return
+		}
+
+		_ = h.svc.Delete(quest)
+		questBytes, _ := json.Marshal(quest)
+		w.Write(questBytes)
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
