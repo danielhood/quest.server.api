@@ -46,6 +46,19 @@ func (h *User) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			w.Write(userBytes)
 		}
 
+	case "POST":
+		log.Print("/user:POST")
+
+		var user = h.parsePutRequest(w, req)
+
+		if user == nil {
+			return
+		}
+
+		_ = h.svc.Create(user)
+		userBytes, _ := json.Marshal(user)
+		w.Write(userBytes)
+
 	case "PUT":
 		log.Print("/user:PUT")
 
