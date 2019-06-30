@@ -26,6 +26,7 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 				LastName:  "User",
 				Roles:     []string{entities.AdministratorRole},
 				IsOnline:  false,
+				IsEnabled: true,
 			})
 
 			userRepo.Add(&entities.User{
@@ -35,6 +36,7 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 				LastName:  "User",
 				Roles:     []string{},
 				IsOnline:  false,
+				IsEnabled: false,
 			})
 		}
 	}
@@ -51,6 +53,22 @@ func generateDefaultQuests(questRepo repositories.QuestRepo) {
 				Name:      "Find All Treasures",
 				Desc:      "Find all treasures in the kingdom",
 				IsEnabled: true,
+			})
+		}
+	}
+}
+
+func generateDefaultPlayers(playerRepo repositories.PlayerRepo) {
+	log.Print("Generating default players")
+	if players, err := playerRepo.GetAll(); err != nil {
+		panic(err)
+	} else {
+		if len(players) == 0 {
+			playerRepo.Add(&entities.Player{
+				Code:      "1234abcd",
+				Name:      "Test User",
+				IsEnabled: true,
+				QuestKey:  "FIND_ALL_TREASURES",
 			})
 		}
 	}
@@ -101,6 +119,7 @@ func main() {
 
 	generateDefaultUsers(userRepo)
 	generateDefaultQuests(questRepo)
+	generateDefaultPlayers(playerRepo)
 
 	log.Print("Creating routes")
 	createDefaultRoutes(userRepo, playerRepo, deviceRepo, questRepo)
