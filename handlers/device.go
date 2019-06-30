@@ -28,14 +28,15 @@ func NewDevice(dr repositories.DeviceRepo) *Device {
 }
 
 func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	// All device funcitons require user level access
-	if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		return
-	}
-
 	switch req.Method {
 	case "GET":
+
+		// Device GET funciton requires device or user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "device" && req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
 		log.Print("/device:GET")
 
 		var deviceGetRequest = h.parseGetRequest(w, req)
@@ -46,6 +47,12 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		var deviceBytes []byte
 		if len(deviceGetRequest.Hostname) == 0 {
+			// Device GET all funciton requires user level access
+			if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+
 			deviceList, _ := h.svc.ReadAll()
 			deviceBytes, _ = json.Marshal(deviceList)
 		} else {
@@ -61,6 +68,13 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		w.Write(deviceBytes)
 
 	case "PUT":
+
+		// Device PUT funciton requires user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
 		log.Print("/device:PUT")
 
 		var device = h.parsePutRequest(w, req)
