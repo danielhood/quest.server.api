@@ -130,7 +130,7 @@ func (s *tokenService) getDeviceToken(d *entities.Device) (string, error) {
 		"device",
 		jwt.StandardClaims{
 			Id:        d.Hostname + ":" + d.DeviceKey,
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(time.Minute * 5).Unix(),
 			Issuer:    "token-service",
 		},
 	}
