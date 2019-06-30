@@ -36,7 +36,7 @@ func (h *Trigger) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "POST":
-		log.Print("/object:POST")
+		log.Print("/trigger:POST")
 
 		var triggerRequest = h.parseRequest(w, req)
 

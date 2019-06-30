@@ -36,7 +36,7 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "GET":
-		log.Print("/object:GET")
+		log.Print("/device:GET")
 
 		var deviceGetRequest = h.parseGetRequest(w, req)
 
@@ -56,7 +56,7 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		w.Write(deviceBytes)
 
 	case "PUT":
-		log.Print("/object:PUT")
+		log.Print("/device:PUT")
 
 		var device = h.parsePutRequest(w, req)
 
