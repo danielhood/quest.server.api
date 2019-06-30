@@ -8,6 +8,7 @@ import (
 // UserService provides a CRUD interface for Users
 type UserService interface {
 	Create(*entities.User) error
+	ReadAll() ([]entities.User, error)
 	Read(string) (*entities.User, error)
 	Update(*entities.User) error
 	Delete(*entities.User) error
@@ -26,6 +27,10 @@ type userService struct {
 
 func (s *userService) Create(u *entities.User) error {
 	return s.userRepo.Add(u)
+}
+
+func (s *userService) ReadAll() ([]entities.User, error) {
+	return s.userRepo.GetAll()
 }
 
 func (s *userService) Read(username string) (*entities.User, error) {

@@ -35,13 +35,14 @@ func (h *User) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		username := req.URL.Query().Get("username")
 
 		if len(username) == 0 {
-			http.Error(w, "Username not specified", http.StatusInternalServerError)
-			return
+			users, _ := h.svc.ReadAll()
+			usersBytes, _ := json.Marshal(users)
+			w.Write(usersBytes)
+		} else {
+			user, _ := h.svc.Read(username)
+			userBytes, _ := json.Marshal(user)
+			w.Write(userBytes)
 		}
-
-		user, _ := h.svc.Read(username)
-		userBytes, _ := json.Marshal(user)
-		w.Write(userBytes)
 
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
