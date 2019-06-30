@@ -70,7 +70,7 @@ func (r *playerRepo) Add(p *entities.Player) error {
 		existing.QuestKey = p.QuestKey
 		existing.QuestState = p.QuestState
 		existing.Achievements = p.Achievements
-		existing.Isnabled = p.Isnabled
+		existing.IsEnabled = p.IsEnabled
 	} else {
 		players = append(players, *p)
 	}

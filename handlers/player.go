@@ -22,14 +22,15 @@ func NewPlayer(ur repositories.PlayerRepo) *Player {
 }
 
 func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	// All player funcitons require user level access
-	if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		return
-	}
-
 	switch req.Method {
 	case "GET":
+
+		// Player GET requires device or user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "device" && req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
 		log.Print("/player:GET")
 
 		log.Print("GET params were:", req.URL.Query())
@@ -52,6 +53,13 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 	case "POST":
+
+		// Player POST requires user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
 		log.Print("/player:POST")
 
 		var player = h.parsePutRequest(w, req)
@@ -65,12 +73,27 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		w.Write(playerBytes)
 
 	case "PUT":
+
+		// Player PUT requires device or user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "device" && req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
 		log.Print("/player:PUT")
 
 		var player = h.parsePutRequest(w, req)
 
 		if player == nil {
 			return
+		}
+
+		// Devicve access can only update quest
+		if req.Header.Get("QUEST_AUTH_TYPE") == "device" {
+			playerOrig, _ := h.svc.Read(player.Code)
+			playerOrig.QuestKey = player.QuestKey
+			playerOrig.QuestState = player.QuestState
+			player = playerOrig
 		}
 
 		_ = h.svc.Update(player)

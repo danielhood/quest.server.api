@@ -39,13 +39,14 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 	}
 }
 
-func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories.PlayerRepo, deviceRepo repositories.DeviceRepo) {
+func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories.PlayerRepo, deviceRepo repositories.DeviceRepo, questRepo repositories.QuestRepo) {
 	pingHandler := handlers.NewPing()
 	tokenHandler := handlers.NewToken(userRepo, deviceRepo)
 	userHandler := handlers.NewUser(userRepo)
 	playerHandler := handlers.NewPlayer(playerRepo)
 	triggerHandler := handlers.NewTrigger(playerRepo, deviceRepo)
 	deviceHandler := handlers.NewDevice(deviceRepo)
+	questHandler := handlers.NewQuest(questRepo)
 
 	auth := security.NewAuthentication()
 
@@ -55,6 +56,7 @@ func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories
 	http.Handle("/player", addMiddleware(playerHandler, auth.Authenticate))
 	http.Handle("/trigger", addMiddleware(triggerHandler, auth.Authenticate))
 	http.Handle("/device", addMiddleware(deviceHandler, auth.Authenticate))
+	http.Handle("/quest", addMiddleware(questHandler, auth.Authenticate))
 }
 
 func addMiddleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
@@ -78,12 +80,13 @@ func main() {
 	userRepo := repositories.NewUserRepo(storageManager)
 	playerRepo := repositories.NewPlayerRepo(storageManager)
 	deviceRepo := repositories.NewDeviceRepo(storageManager)
+	questRepo := repositories.NewQuestRepo(storageManager)
 
 	log.Print("Generating default users")
 	generateDefaultUsers(userRepo)
 
 	log.Print("Creating routes")
-	createDefaultRoutes(userRepo, playerRepo, deviceRepo)
+	createDefaultRoutes(userRepo, playerRepo, deviceRepo, questRepo)
 
 	// openssl genrsa -out server.key 2048
 	certPath := "server.pem"

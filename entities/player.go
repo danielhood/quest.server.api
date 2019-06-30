@@ -7,5 +7,5 @@ type Player struct {
 	QuestKey     uint   `json:"questkey"`
 	QuestState   string `josn:"queststate"`
 	Achievements string `json:"achievements"`
-	Isnabled     bool   `json:"isenabled"`
+	IsEnabled    bool   `json:"isenabled"`
 }
