@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/services"
 )
@@ -19,7 +18,7 @@ type Trigger struct {
 // TriggerRequest holds request parameters for trigger POST.
 type TriggerRequest struct {
 	PlayerCode string `json:"playercode"`
-	DeviceKey  string `json:"devicekey"`
+	DeviceType string `json:"devicetype"`
 }
 
 // NewTrigger creates new instance of TriggerService
@@ -44,9 +43,7 @@ func (h *Trigger) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		var player *entities.Player
-		var device *entities.Device
-		var deviceActionCode, err = h.svc.Trigger(player, device)
+		var deviceActionCode, err = h.svc.Trigger(triggerRequest.PlayerCode, triggerRequest.DeviceType)
 
 		if err != nil {
 			http.Error(w, "Unable to process trigger", http.StatusInternalServerError)
@@ -85,8 +82,8 @@ func (h *Trigger) parseRequest(w http.ResponseWriter, req *http.Request) *Trigge
 		return nil
 	}
 
-	if len(triggerRequest.DeviceKey) == 0 {
-		http.Error(w, "DeviceKey not specified", http.StatusInternalServerError)
+	if len(triggerRequest.DeviceType) == 0 {
+		http.Error(w, "DeviceType not specified", http.StatusInternalServerError)
 		return nil
 	}
 

@@ -57,6 +57,10 @@ func (s *tokenService) ProcessUserLogin(username string, password string) (strin
 		return "", errors.New("Invalid password")
 	}
 
+	if !user.IsEnabled {
+		return "", errors.New("User not enabled")
+	}
+
 	return s.getUserToken(user)
 }
 
@@ -82,12 +86,13 @@ func (s *tokenService) ProcessDeviceLogin(hostname string, deviceKey string) (st
 	}
 
 	// Check if registered
-	if device.IsRegistered {
-		return s.getDeviceToken(device)
+	if !device.IsRegistered {
+		// Device exists, but not registered, so return no token
+		return "", errors.New("Device not registered")
+
 	}
 
-	// Device exists, but not registered, so return no token
-	return "", errors.New("Device not registered")
+	return s.getDeviceToken(device)
 }
 
 // GetUserToken retrieves a token for a user
