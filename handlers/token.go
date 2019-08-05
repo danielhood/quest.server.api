@@ -26,6 +26,10 @@ type TokenRequest struct {
 	DeviceKey string `json:"devicekey"`
 }
 
+type TokenResponse struct {
+	Token string `json:"token"`
+}
+
 // NewToken creates new handler for tokens
 func NewToken(ur repositories.UserRepo, dr repositories.DeviceRepo) *Token {
 	return &Token{
@@ -36,9 +40,15 @@ func NewToken(ur repositories.UserRepo, dr repositories.DeviceRepo) *Token {
 
 // Handler will return tokens
 func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	t.enableCors(&w)
 	switch req.Method {
-	case "GET":
-		log.Print("/token:GET")
+	case "OPTIONS":
+		log.Print("/token:OPTIONS")
+		w.Header().Set("Allow", "GET,POST")
+		w.Header().Set("Access-Control-Allow-Headers", "access-control-allow-origin,content-type")
+
+	case "GET", "POST":
+		log.Print("/token:", req.Method)
 
 		requestBody, err := ioutil.ReadAll(req.Body)
 		defer req.Body.Close()
@@ -73,9 +83,18 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		w.Write([]byte(token))
+		var tokenResponse TokenResponse
+		tokenResponse.Token = token
 
+		//w.Write([]byte(token))
+		var tokenBytes []byte
+		tokenBytes, _ = json.Marshal(tokenResponse)
+		w.Write(tokenBytes)
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
+}
+
+func (t *Token) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }

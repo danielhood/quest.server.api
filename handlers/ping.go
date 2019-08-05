@@ -23,9 +23,16 @@ func (h *Ping) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Print("/ping:GET")
 
 		s := h.svc.Get()
+
+		h.enableCors(&w)
+
 		w.Write([]byte(s))
 
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
+}
+
+func (h *Ping) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }

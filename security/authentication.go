@@ -28,6 +28,12 @@ func NewAuthentication() *Authentication {
 
 func (a *Authentication) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow OPTIONS passthrough
+		if (r.Method == "OPTIONS") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		var token string
 
 		// Get token from the Authorization header

@@ -28,7 +28,13 @@ func NewDevice(dr repositories.DeviceRepo) *Device {
 }
 
 func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	h.enableCors(&w)
 	switch req.Method {
+	case "OPTIONS":
+		log.Print("/token:OPTIONS")
+		w.Header().Set("Allow", "GET,POST")
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,access-control-allow-origin,content-type")
+
 	case "GET":
 
 		// Device GET funciton requires device or user level access
@@ -155,4 +161,8 @@ func (h *Device) parsePutRequest(w http.ResponseWriter, req *http.Request) *enti
 	}
 
 	return &device
+}
+
+func (h *Device) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
