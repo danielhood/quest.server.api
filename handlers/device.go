@@ -32,7 +32,10 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "OPTIONS":
 		log.Print("/token:OPTIONS")
-		w.Header().Set("Allow", "GET,POST")
+		if req.Header.Get("Access-Control-Request-Method") != "" {
+			w.Header().Set("Allow", req.Header.Get("Access-Control-Request-Method"))
+			w.Header().Set("Access-Control-Allow-Methods", req.Header.Get("Access-Control-Request-Method"))
+		}
 		w.Header().Set("Access-Control-Allow-Headers", "authorization,access-control-allow-origin,content-type")
 
 	case "GET":
@@ -92,6 +95,8 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		_ = h.svc.Update(device)
 		deviceBytes, _ := json.Marshal(device)
+
+		w.Header().Set("Content-Type", "application/json")
 		w.Write(deviceBytes)
 
 	default:
