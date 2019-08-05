@@ -22,7 +22,20 @@ func NewPlayer(ur repositories.PlayerRepo) *Player {
 }
 
 func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	h.enableCors(&w)
+
 	switch req.Method {
+	case "OPTIONS":
+
+		log.Print("/token:OPTIONS")
+
+		if req.Header.Get("Access-Control-Request-Method") != "" {
+			w.Header().Set("Allow", req.Header.Get("Access-Control-Request-Method"))
+			w.Header().Set("Access-Control-Allow-Methods", req.Header.Get("Access-Control-Request-Method"))
+		}
+
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,access-control-allow-origin,content-type")
+
 	case "GET":
 
 		// Player GET requires device or user level access
@@ -131,4 +144,8 @@ func (h *Player) parsePutRequest(w http.ResponseWriter, req *http.Request) *enti
 	}
 
 	return &player
+}
+
+func (h *Player) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }

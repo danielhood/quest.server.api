@@ -29,6 +29,7 @@ func NewDevice(dr repositories.DeviceRepo) *Device {
 
 func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	h.enableCors(&w)
+
 	switch req.Method {
 	case "OPTIONS":
 		log.Print("/token:OPTIONS")
