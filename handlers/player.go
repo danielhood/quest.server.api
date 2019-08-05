@@ -113,6 +113,37 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		playerBytes, _ := json.Marshal(player)
 		w.Write(playerBytes)
 
+	case "DELETE":
+
+		// Player DELETE requires user level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		log.Print("/player:DELETE")
+
+		log.Print("DELETE params were:", req.URL.Query())
+
+		playerCode := req.URL.Query().Get("code")
+
+		if len(playerCode) == 0 {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		player, err := h.svc.Read(playerCode)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		err = h.svc.Delete(player)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
