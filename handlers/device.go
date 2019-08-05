@@ -71,6 +71,7 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			deviceBytes, _ = json.Marshal(device)
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.Write(deviceBytes)
 
 	case "PUT":

@@ -89,6 +89,8 @@ func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		//w.Write([]byte(token))
 		var tokenBytes []byte
 		tokenBytes, _ = json.Marshal(tokenResponse)
+
+		w.Header().Set("Content-Type", "application/json")
 		w.Write(tokenBytes)
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
