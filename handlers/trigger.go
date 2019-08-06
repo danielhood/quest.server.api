@@ -17,7 +17,7 @@ type Trigger struct {
 
 // TriggerRequest holds request parameters for trigger POST.
 type TriggerRequest struct {
-	PlayerCode string `json:"playercode"`
+	PlayerCode int    `json:"playercode"`
 	DeviceType string `json:"devicetype"`
 }
 
@@ -40,12 +40,14 @@ func (h *Trigger) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		var triggerRequest = h.parseRequest(w, req)
 
 		if triggerRequest == nil {
+			log.Print("nil triggerRequest")
 			return
 		}
 
 		var deviceActionCode, err = h.svc.Trigger(triggerRequest.PlayerCode, triggerRequest.DeviceType)
 
 		if err != nil {
+			log.Print("Unable to process trigger")
 			http.Error(w, "Unable to process trigger", http.StatusInternalServerError)
 			return
 		}
@@ -71,14 +73,11 @@ func (h *Trigger) parseRequest(w http.ResponseWriter, req *http.Request) *Trigge
 		return nil
 	}
 
+	log.Print("Request body: ", requestBody)
+
 	var triggerRequest TriggerRequest
 	if err = json.Unmarshal(requestBody, &triggerRequest); err != nil {
 		http.Error(w, "Unable to parse TriggerRequest json", http.StatusInternalServerError)
-		return nil
-	}
-
-	if len(triggerRequest.PlayerCode) == 0 {
-		http.Error(w, "PlayerCode not specified", http.StatusInternalServerError)
 		return nil
 	}
 

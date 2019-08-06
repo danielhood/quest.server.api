@@ -2,7 +2,7 @@ package entities
 
 // Player defines a player for our application
 type Player struct {
-	Code         string `json:"code"`
+	Code         int    `json:"code"`
 	Name         string `json:"name"`
 	QuestKey     string `json:"questkey"`
 	QuestState   string `json:"queststate"`

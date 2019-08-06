@@ -6,7 +6,7 @@ import (
 
 // TriggerService provides a hook into the game engine for player triggered devices
 type TriggerService interface {
-	Trigger(string, string) (string, error)
+	Trigger(int, string) (string, error)
 }
 
 // NewTriggerService creates a new TriggerService
@@ -22,7 +22,7 @@ type triggerService struct {
 	deviceRepo repositories.DeviceRepo
 }
 
-func (s *triggerService) Trigger(playerCode string, deviceType string) (string, error) {
+func (s *triggerService) Trigger(playerCode int, deviceType string) (string, error) {
 	// Valid action codes are: NONE, UNKNOWN_PLAYER, NO_QUEST, COMPLETED, ACTIVATE
 
 	player, _ := s.playerRepo.GetByCode(playerCode)

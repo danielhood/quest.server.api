@@ -9,7 +9,7 @@ import (
 type PlayerService interface {
 	Create(*entities.Player) error
 	ReadAll() ([]entities.Player, error)
-	Read(string) (*entities.Player, error)
+	Read(int) (*entities.Player, error)
 	Update(*entities.Player) error
 	Delete(*entities.Player) error
 }
@@ -33,7 +33,7 @@ func (s *playerService) ReadAll() ([]entities.Player, error) {
 	return s.playerRepo.GetAll()
 }
 
-func (s *playerService) Read(playerCode string) (*entities.Player, error) {
+func (s *playerService) Read(playerCode int) (*entities.Player, error) {
 	return s.playerRepo.GetByCode(playerCode)
 }
 

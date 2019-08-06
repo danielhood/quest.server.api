@@ -18,7 +18,7 @@ func init() {
 // PlayerRepo defines interface
 type PlayerRepo interface {
 	GetAll() ([]entities.Player, error)
-	GetByCode(code string) (*entities.Player, error)
+	GetByCode(code int) (*entities.Player, error)
 	Add(o *entities.Player) error
 	Delete(o *entities.Player) error
 }
@@ -50,7 +50,7 @@ func (r *playerRepo) GetAll() ([]entities.Player, error) {
 	return allPlayers, nil
 }
 
-func (r *playerRepo) GetByCode(code string) (*entities.Player, error) {
+func (r *playerRepo) GetByCode(code int) (*entities.Player, error) {
 	for i, p := range players {
 		if p.Code == code {
 			return &players[i], nil

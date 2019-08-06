@@ -65,7 +65,7 @@ func generateDefaultPlayers(playerRepo repositories.PlayerRepo) {
 	} else {
 		if len(players) == 0 {
 			playerRepo.Add(&entities.Player{
-				Code:      "1234abcd",
+				Code:      12345678,
 				Name:      "Test User",
 				IsEnabled: true,
 				QuestKey:  "FIND_ALL_TREASURES",

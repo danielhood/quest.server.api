@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/repositories"
@@ -55,7 +56,8 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			playersBytes, _ := json.Marshal(players)
 			w.Write(playersBytes)
 		} else {
-			player, err := h.svc.Read(playerCode)
+			playerCodeInt, _ := strconv.Atoi(playerCode)
+			player, err := h.svc.Read(playerCodeInt)
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				return
@@ -132,7 +134,8 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		player, err := h.svc.Read(playerCode)
+		playerCodeInt, _ := strconv.Atoi(playerCode)
+		player, err := h.svc.Read(playerCodeInt)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
@@ -166,11 +169,6 @@ func (h *Player) parsePutRequest(w http.ResponseWriter, req *http.Request) *enti
 	var player entities.Player
 	if err = json.Unmarshal(requestBody, &player); err != nil {
 		http.Error(w, "Unable to parse Player json", http.StatusInternalServerError)
-		return nil
-	}
-
-	if len(player.Code) == 0 {
-		http.Error(w, "code not specified", http.StatusInternalServerError)
 		return nil
 	}
 
