@@ -42,8 +42,8 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 
 	switch player.QuestKey {
 	case "FIND_ALL_TREASURE":
-		findAllTreasureQuest := quests.NewFindAllTreasureQuest()
-		return findAllTreasureQuest.Trigger(player.Code, deviceType)
+		findAllTreasureQuest := quests.NewFindAllTreasureQuest(s.playerRepo)
+		return findAllTreasureQuest.Trigger(player, deviceType)
 	default:
 		return "UNKNOWN_QUEST", nil
 	}
