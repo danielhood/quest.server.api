@@ -41,6 +41,7 @@ func NewToken(ur repositories.UserRepo, dr repositories.DeviceRepo) *Token {
 // Handler will return tokens
 func (t *Token) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	t.enableCors(&w)
+
 	switch req.Method {
 	case "OPTIONS":
 		log.Print("/token:OPTIONS")

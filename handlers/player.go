@@ -51,6 +51,8 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		playerCode := req.URL.Query().Get("code")
 
+		log.Print("PlayerCode: ", playerCode)
+
 		if len(playerCode) == 0 {
 			players, _ := h.svc.ReadAll()
 			playersBytes, _ := json.Marshal(players)

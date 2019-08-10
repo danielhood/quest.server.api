@@ -27,15 +27,25 @@ func NewTrigger(pr repositories.PlayerRepo, dr repositories.DeviceRepo) *Trigger
 }
 
 func (h *Trigger) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	// All trigger funcitons require device level access
-	if req.Header.Get("QUEST_AUTH_TYPE") != "device" {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		return
-	}
+	h.enableCors(&w)
 
 	switch req.Method {
+	case "OPTIONS":
+		log.Print("/token:OPTIONS")
+		if req.Header.Get("Access-Control-Request-Method") != "" {
+			w.Header().Set("Allow", req.Header.Get("Access-Control-Request-Method"))
+			w.Header().Set("Access-Control-Allow-Methods", req.Header.Get("Access-Control-Request-Method"))
+		}
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,access-control-allow-origin,content-type")
+
 	case "POST":
 		log.Print("/trigger:POST")
+
+		// All trigger funcitons require device level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "device" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
 
 		var triggerRequest = h.parseRequest(w, req)
 
@@ -73,8 +83,6 @@ func (h *Trigger) parseRequest(w http.ResponseWriter, req *http.Request) *Trigge
 		return nil
 	}
 
-	log.Print("Request body: ", requestBody)
-
 	var triggerRequest TriggerRequest
 	if err = json.Unmarshal(requestBody, &triggerRequest); err != nil {
 		http.Error(w, "Unable to parse TriggerRequest json", http.StatusInternalServerError)
@@ -87,4 +95,8 @@ func (h *Trigger) parseRequest(w http.ResponseWriter, req *http.Request) *Trigge
 	}
 
 	return &triggerRequest
+}
+
+func (h *Trigger) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
