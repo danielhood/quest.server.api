@@ -49,9 +49,9 @@ func generateDefaultQuests(questRepo repositories.QuestRepo) {
 	} else {
 		if len(quests) == 0 {
 			questRepo.Add(&entities.Quest{
-				Key:       "FIND_ALL_TREASURES",
-				Name:      "Find All Treasures",
-				Desc:      "Find all treasures in the kingdom",
+				Key:       "FIND_ALL_TREASURE",
+				Name:      "Find All Treasure",
+				Desc:      "Find all treasure in the kingdom",
 				IsEnabled: true,
 			})
 		}
@@ -68,7 +68,7 @@ func generateDefaultPlayers(playerRepo repositories.PlayerRepo) {
 				Code:      12345678,
 				Name:      "Test User",
 				IsEnabled: true,
-				QuestKey:  "FIND_ALL_TREASURES",
+				QuestKey:  "FIND_ALL_TREASURE",
 			})
 		}
 	}

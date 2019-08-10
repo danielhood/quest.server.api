@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/danielhood/quest.server.api/quests"
 	"github.com/danielhood/quest.server.api/repositories"
 )
 
@@ -39,7 +40,11 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 		return "NO_QUEST", nil
 	}
 
-	// TODO: Process game state for player on current quest and return device action code
-
-	return "ACTIVATE", nil
+	switch player.QuestKey {
+	case "FIND_ALL_TREASURE":
+		findAllTreasureQuest := quests.NewFindAllTreasureQuest()
+		return findAllTreasureQuest.Trigger(player.Code, deviceType)
+	default:
+		return "UNKNOWN_QUEST", nil
+	}
 }
