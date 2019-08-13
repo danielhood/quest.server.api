@@ -24,8 +24,6 @@ type triggerService struct {
 }
 
 func (s *triggerService) Trigger(playerCode int, deviceType string) (string, error) {
-	// Valid action codes are: NONE, UNKNOWN_PLAYER, NO_QUEST, COMPLETED, ACTIVATE
-
 	player, _ := s.playerRepo.GetByCode(playerCode)
 
 	if player == nil {
