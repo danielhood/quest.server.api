@@ -24,6 +24,9 @@ type findAllTreasureQuestState struct {
 	hasTreasure4 bool
 }
 
+// QuestKey holds string key for this quest
+const questKey string = "FIND_ALL_TREASURE"
+
 // NewFindAllTreasureQuest creates a new FindAllTreasureQuest
 func NewFindAllTreasureQuest(pr repositories.PlayerRepo) FindAllTreasureQuest {
 	return &findAllTreasureQuest{
@@ -31,39 +34,51 @@ func NewFindAllTreasureQuest(pr repositories.PlayerRepo) FindAllTreasureQuest {
 	}
 }
 
+func (q *findAllTreasureQuest) hasCompletedQuest(player *entities.Player) bool {
+	for _, key := range player.Achievements {
+		if key == questKey {
+			return true
+		}
+	}
+	return false
+}
+
 func (q *findAllTreasureQuest) Trigger(player *entities.Player, deviceType string) (string, error) {
-	// Valid action codes are: NONE, UNKNOWN_PLAYER, NO_QUEST, COMPLETED, ACTIVATE, WRONG_ITEM
+	if q.hasCompletedQuest(player) {
+		return QuestResponseCompleted, nil
+	}
 
 	if player.QuestStatus == "" {
-		player.QuestStatus = "ACTIVE"
+		player.QuestStatus = QuestStatusActive
 		player.QuestState, _ = json.Marshal(&findAllTreasureQuestState{false, false, false, false})
 	}
 
 	var questState findAllTreasureQuestState
 	json.Unmarshal(player.QuestState, &questState)
 
-	triggerResponse := "ACTIVATE"
+	triggerResponse := QuestResponseActivate
 
 	switch deviceType {
-	case "TREASURE:1":
+	case DeviceTypeTreasure1:
 		questState.hasTreasure1 = true
 		break
-	case "TREASURE:2":
+	case DeviceTypeTreasure2:
 		questState.hasTreasure2 = true
 		break
-	case "TREASURE:3":
+	case DeviceTypeTreasure3:
 		questState.hasTreasure3 = true
 		break
-	case "TREASURE:4":
+	case DeviceTypeTreasure4:
 		questState.hasTreasure4 = true
 		break
 	default:
-		triggerResponse = "WRONG_ITEM"
+		triggerResponse = QuestResponseWrongItem
 	}
 
 	if questState.hasTreasure1 && questState.hasTreasure2 && questState.hasTreasure3 && questState.hasTreasure4 {
-		player.QuestStatus = "COMPLETED"
-		log.Print("QuestStatus: COMPLETED")
+		player.QuestStatus = QuestStatusCompleted
+		log.Print("QuestStatus: ", QuestStatusCompleted)
+		player.Achievements = append(player.Achievements, questKey)
 	}
 
 	player.QuestState, _ = json.Marshal(questState)

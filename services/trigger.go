@@ -29,15 +29,15 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 	player, _ := s.playerRepo.GetByCode(playerCode)
 
 	if player == nil {
-		return "UNKNOWN_PLAYER", nil
+		return quests.QuestResponseUnknownPlayer, nil
 	}
 
 	if !player.IsEnabled {
-		return "UNKNOWN_PLAYER", nil
+		return quests.QuestResponseUnknownPlayer, nil
 	}
 
 	if player.QuestKey == "" {
-		return "NO_QUEST", nil
+		return quests.QuestResponseNoQuest, nil
 	}
 
 	switch player.QuestKey {
@@ -45,6 +45,6 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 		findAllTreasureQuest := quests.NewFindAllTreasureQuest(s.playerRepo)
 		return findAllTreasureQuest.Trigger(player, deviceType)
 	default:
-		return "UNKNOWN_QUEST", nil
+		return quests.QuestResponseUnknownQuest, nil
 	}
 }
