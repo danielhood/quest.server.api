@@ -17,15 +17,12 @@ type findAllTreasureQuest struct {
 	playerRepo repositories.PlayerRepo
 }
 
-type findAllTreasureQuestState struct {
-	hasTreasure1 bool
-	hasTreasure2 bool
-	hasTreasure3 bool
-	hasTreasure4 bool
+type FindAllTreasureQuestState struct {
+	HasTreasure1 bool `json:"hastreasure1"`
+	HasTreasure2 bool `json:"hastreasure2"`
+	HasTreasure3 bool `json:"hastreasure3"`
+	HasTreasure4 bool `json:"hastreasure4"`
 }
-
-// QuestKey holds string key for this quest
-const questKey string = "FIND_ALL_TREASURE"
 
 // NewFindAllTreasureQuest creates a new FindAllTreasureQuest
 func NewFindAllTreasureQuest(pr repositories.PlayerRepo) FindAllTreasureQuest {
@@ -36,7 +33,7 @@ func NewFindAllTreasureQuest(pr repositories.PlayerRepo) FindAllTreasureQuest {
 
 func (q *findAllTreasureQuest) hasCompletedQuest(player *entities.Player) bool {
 	for _, key := range player.Achievements {
-		if key == questKey {
+		if key == QuestKeyFindAllTreasure {
 			return true
 		}
 	}
@@ -44,44 +41,72 @@ func (q *findAllTreasureQuest) hasCompletedQuest(player *entities.Player) bool {
 }
 
 func (q *findAllTreasureQuest) Trigger(player *entities.Player, deviceType string) (string, error) {
+
+	log.Print("In: ", player.QuestState)
+
 	if q.hasCompletedQuest(player) {
 		return QuestResponseCompleted, nil
 	}
 
 	if player.QuestStatus == "" {
 		player.QuestStatus = QuestStatusActive
-		player.QuestState, _ = json.Marshal(&findAllTreasureQuestState{false, false, false, false})
+		log.Print("Resetting quest state")
+		questStateBytes, _ := json.Marshal(&FindAllTreasureQuestState{false, false, false, false})
+		player.QuestState = string(questStateBytes)
 	}
 
-	var questState findAllTreasureQuestState
-	json.Unmarshal(player.QuestState, &questState)
+	var questState FindAllTreasureQuestState
+	json.Unmarshal([]byte(player.QuestState), &questState)
+
+	log.Print(questState.HasTreasure1, questState.HasTreasure2, questState.HasTreasure3, questState.HasTreasure4)
 
 	triggerResponse := QuestResponseActivate
 
 	switch deviceType {
 	case DeviceTypeTreasure1:
-		questState.hasTreasure1 = true
+		if questState.HasTreasure1 {
+			triggerResponse = QuestResponesItemAlreadyCollected
+		}
+		questState.HasTreasure1 = true
 		break
 	case DeviceTypeTreasure2:
-		questState.hasTreasure2 = true
+		if questState.HasTreasure2 {
+			triggerResponse = QuestResponesItemAlreadyCollected
+		}
+		questState.HasTreasure2 = true
 		break
 	case DeviceTypeTreasure3:
-		questState.hasTreasure3 = true
+		if questState.HasTreasure3 {
+			triggerResponse = QuestResponesItemAlreadyCollected
+		}
+		questState.HasTreasure3 = true
 		break
 	case DeviceTypeTreasure4:
-		questState.hasTreasure4 = true
+		if questState.HasTreasure4 {
+			triggerResponse = QuestResponesItemAlreadyCollected
+		}
+		questState.HasTreasure4 = true
 		break
 	default:
-		triggerResponse = QuestResponseWrongItem
+		triggerResponse = QuestResponseItemNotPartOfQuest
 	}
 
-	if questState.hasTreasure1 && questState.hasTreasure2 && questState.hasTreasure3 && questState.hasTreasure4 {
+	if questState.HasTreasure1 && questState.HasTreasure2 && questState.HasTreasure3 && questState.HasTreasure4 {
 		player.QuestStatus = QuestStatusCompleted
 		log.Print("QuestStatus: ", QuestStatusCompleted)
-		player.Achievements = append(player.Achievements, questKey)
+		player.Achievements = append(player.Achievements, QuestKeyFindAllTreasure)
+		triggerResponse = QuestResponseCompleted
 	}
 
-	player.QuestState, _ = json.Marshal(questState)
+	questStateBytes, err := json.Marshal(questState)
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	player.QuestState = string(questStateBytes)
+
+	log.Print("Out: ", player.QuestState)
 
 	q.playerRepo.Add(player)
 

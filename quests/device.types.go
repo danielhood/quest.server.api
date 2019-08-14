@@ -4,3 +4,8 @@ const DeviceTypeTreasure1 string = "TREASURE:1"
 const DeviceTypeTreasure2 string = "TREASURE:2"
 const DeviceTypeTreasure3 string = "TREASURE:3"
 const DeviceTypeTreasure4 string = "TREASURE:4"
+
+const DeviceTypeStarRed string = "STAR:RED"
+const DeviceTypeStarYellow string = "STAR:YELLOW"
+const DeviceTypeStarGreen string = "STAR:GREEN"
+const DeviceTypeStarBlue string = "STAR:BLUE"

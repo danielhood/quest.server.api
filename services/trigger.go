@@ -43,6 +43,9 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 		findAllTreasureQuest := quests.NewFindAllTreasureQuest(s.playerRepo)
 		return findAllTreasureQuest.Trigger(player, deviceType)
 	default:
+		player.QuestState = ""
+		player.QuestStatus = ""
+		s.playerRepo.Add(player)
 		return quests.QuestResponseUnknownQuest, nil
 	}
 }
