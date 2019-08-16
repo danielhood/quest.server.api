@@ -17,7 +17,7 @@ type findAllTreasureQuest struct {
 	playerRepo repositories.PlayerRepo
 }
 
-type FindAllTreasureQuestState struct {
+type findAllTreasureQuestState struct {
 	HasTreasure1 bool `json:"hastreasure1"`
 	HasTreasure2 bool `json:"hastreasure2"`
 	HasTreasure3 bool `json:"hastreasure3"`
@@ -51,11 +51,11 @@ func (q *findAllTreasureQuest) Trigger(player *entities.Player, deviceType strin
 	if player.QuestStatus == "" {
 		player.QuestStatus = QuestStatusActive
 		log.Print("Resetting quest state")
-		questStateBytes, _ := json.Marshal(&FindAllTreasureQuestState{false, false, false, false})
+		questStateBytes, _ := json.Marshal(&findAllTreasureQuestState{false, false, false, false})
 		player.QuestState = string(questStateBytes)
 	}
 
-	var questState FindAllTreasureQuestState
+	var questState findAllTreasureQuestState
 	json.Unmarshal([]byte(player.QuestState), &questState)
 
 	log.Print(questState.HasTreasure1, questState.HasTreasure2, questState.HasTreasure3, questState.HasTreasure4)

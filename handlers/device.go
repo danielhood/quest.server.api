@@ -48,15 +48,24 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		log.Print("/device:GET")
+		var deviceHostname string
+		var deviceKey string
+		deviceHostname = req.URL.Query().Get("hostname")
+		deviceKey = req.URL.Query().Get("key")
 
-		var deviceGetRequest = h.parseGetRequest(w, req)
+		if len(deviceHostname) == 0 {
+			var deviceGetRequest = h.parseGetRequest(w, req)
 
-		if deviceGetRequest == nil {
-			return
+			if deviceGetRequest == nil {
+				return
+			}
+
+			deviceHostname = deviceGetRequest.Hostname
+			deviceKey = deviceGetRequest.DeviceKey
 		}
 
 		var deviceBytes []byte
-		if len(deviceGetRequest.Hostname) == 0 {
+		if len(deviceHostname) == 0 {
 			// Device GET all funciton requires user level access
 			if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -66,7 +75,7 @@ func (h *Device) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			deviceList, _ := h.svc.ReadAll()
 			deviceBytes, _ = json.Marshal(deviceList)
 		} else {
-			device, err := h.svc.Read(deviceGetRequest.Hostname, deviceGetRequest.DeviceKey)
+			device, err := h.svc.Read(deviceHostname, deviceKey)
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 				return

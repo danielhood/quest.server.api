@@ -18,10 +18,10 @@ type starsOrderedQuest struct {
 }
 
 type starsOrderedQuestState struct {
-	hasStarRed    bool
-	hasStarYellow bool
-	hasStarGreen  bool
-	hasStarBlue   bool
+	HasStarRed    bool `json:"hasstarred"`
+	HasStarYellow bool `json:"hasstaryellow"`
+	HasStarGreen  bool `json:"hasstargreen"`
+	HasStarBlue   bool `json:"hasstarblue"`
 }
 
 // NewStarsOrderedQuest creates a new StarsOrderedQuest
@@ -59,44 +59,44 @@ func (q *starsOrderedQuest) Trigger(player *entities.Player, deviceType string) 
 
 	switch deviceType {
 	case DeviceTypeStarRed:
-		if questState.hasStarRed {
+		if questState.HasStarRed {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
-			questState.hasStarRed = true
+			questState.HasStarRed = true
 		}
 		break
 	case DeviceTypeStarYellow:
-		if !questState.hasStarRed {
+		if !questState.HasStarRed {
 			triggerResponse = QuestResponseItemNotPartOfQuest
-		} else if questState.hasStarYellow {
+		} else if questState.HasStarYellow {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
-			questState.hasStarYellow = true
+			questState.HasStarYellow = true
 		}
 		break
 	case DeviceTypeStarGreen:
-		if !questState.hasStarYellow {
+		if !questState.HasStarYellow {
 			triggerResponse = QuestResponseItemNotPartOfQuest
-		} else if questState.hasStarGreen {
+		} else if questState.HasStarGreen {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
-			questState.hasStarGreen = true
+			questState.HasStarGreen = true
 		}
 		break
 	case DeviceTypeStarBlue:
-		if !questState.hasStarGreen {
+		if !questState.HasStarGreen {
 			triggerResponse = QuestResponseItemNotPartOfQuest
-		} else if questState.hasStarBlue {
+		} else if questState.HasStarBlue {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
-			questState.hasStarBlue = true
+			questState.HasStarBlue = true
 		}
 		break
 	default:
 		triggerResponse = QuestResponseItemNotPartOfQuest
 	}
 
-	if questState.hasStarRed && questState.hasStarYellow && questState.hasStarGreen && questState.hasStarBlue {
+	if questState.HasStarRed && questState.HasStarYellow && questState.HasStarGreen && questState.HasStarBlue {
 		player.QuestStatus = QuestStatusCompleted
 		log.Print("QuestStatus: ", QuestStatusCompleted)
 		player.Achievements = append(player.Achievements, QuestKeyStarsOrdered)
