@@ -67,7 +67,7 @@ func (q *starsOrderedQuest) Trigger(player *entities.Player, deviceType string) 
 		break
 	case DeviceTypeStarYellow:
 		if !questState.HasStarRed {
-			triggerResponse = QuestResponseItemNotPartOfQuest
+			triggerResponse = QuestResponseItemCollectedTooSoon
 		} else if questState.HasStarYellow {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
@@ -76,7 +76,7 @@ func (q *starsOrderedQuest) Trigger(player *entities.Player, deviceType string) 
 		break
 	case DeviceTypeStarGreen:
 		if !questState.HasStarYellow {
-			triggerResponse = QuestResponseItemNotPartOfQuest
+			triggerResponse = QuestResponseItemCollectedTooSoon
 		} else if questState.HasStarGreen {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
@@ -85,11 +85,12 @@ func (q *starsOrderedQuest) Trigger(player *entities.Player, deviceType string) 
 		break
 	case DeviceTypeStarBlue:
 		if !questState.HasStarGreen {
-			triggerResponse = QuestResponseItemNotPartOfQuest
+			triggerResponse = QuestResponseItemCollectedTooSoon
 		} else if questState.HasStarBlue {
 			triggerResponse = QuestResponesItemAlreadyCollected
 		} else {
 			questState.HasStarBlue = true
+			triggerResponse = QuestResponseCompleted
 		}
 		break
 	default:

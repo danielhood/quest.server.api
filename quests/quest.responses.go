@@ -9,6 +9,9 @@ const QuestResponseCompleted string = "COMPLETED"
 // QuestResponseItemNotPartOfQuest - this item is not part of the quest
 const QuestResponseItemNotPartOfQuest string = "ITEM_NOT_PART_OF_QUEST"
 
+// QuestResponseItemCollectedTooSoon - this items must be collected later on in quest
+const QuestResponseItemCollectedTooSoon string = "ITEM_COLLECTED_TOO_SOON"
+
 // QuestResponesItemAlreadyCollected - this item has already been collected (and quest not completed)
 const QuestResponesItemAlreadyCollected string = "ITEM_ALREADY_COLLECTED"
 

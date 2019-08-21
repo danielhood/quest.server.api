@@ -42,6 +42,9 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 	case "FIND_ALL_TREASURE":
 		findAllTreasureQuest := quests.NewFindAllTreasureQuest(s.playerRepo)
 		return findAllTreasureQuest.Trigger(player, deviceType)
+	case "STARS_ORDERED":
+		starsOrderedQuest := quests.NewStarsOrderedQuest(s.playerRepo)
+		return starsOrderedQuest.Trigger(player, deviceType)
 	default:
 		player.QuestState = ""
 		player.QuestStatus = ""
