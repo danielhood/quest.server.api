@@ -96,6 +96,8 @@ func (q *findAllTreasureQuest) Trigger(player *entities.Player, deviceType strin
 		log.Print("QuestStatus: ", QuestStatusCompleted)
 		player.Achievements = append(player.Achievements, QuestKeyFindAllTreasure)
 		triggerResponse = QuestResponseCompleted
+	} else {
+		player.QuestStatus = QuestStatusActive
 	}
 
 	questStateBytes, err := json.Marshal(questState)

@@ -101,6 +101,8 @@ func (q *starsOrderedQuest) Trigger(player *entities.Player, deviceType string) 
 		player.QuestStatus = QuestStatusCompleted
 		log.Print("QuestStatus: ", QuestStatusCompleted)
 		player.Achievements = append(player.Achievements, QuestKeyStarsOrdered)
+	} else {
+		player.QuestStatus = QuestStatusActive
 	}
 
 	questStateBytes, _ := json.Marshal(questState)
