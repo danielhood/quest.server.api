@@ -8,6 +8,7 @@ import (
 // TriggerService provides a hook into the game engine for player triggered devices
 type TriggerService interface {
 	Trigger(int, string) (string, error)
+	GetLastPlayerCode() (int, error)
 }
 
 // NewTriggerService creates a new TriggerService
@@ -23,11 +24,20 @@ type triggerService struct {
 	deviceRepo repositories.DeviceRepo
 }
 
+func (s *triggerService) GetLastPlayerCode() (int, error) {
+	return s.playerRepo.GetLastPlayerCode()
+}
+
 func (s *triggerService) Trigger(playerCode int, deviceType string) (string, error) {
 	player, _ := s.playerRepo.GetByCode(playerCode)
 
 	if player == nil {
 		return quests.QuestResponseUnknownPlayer, nil
+	}
+
+	if deviceType == "ADMIN:TRIGGER" {
+		s.playerRepo.SetLastPlayerCode(player.Code)
+		return quests.QuestResponseActivate, nil
 	}
 
 	if !player.IsEnabled {

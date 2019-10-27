@@ -19,18 +19,22 @@ func init() {
 type PlayerRepo interface {
 	GetAll() ([]entities.Player, error)
 	GetByCode(code int) (*entities.Player, error)
+	GetLastPlayerCode() (int, error)
+	SetLastPlayerCode(int) error
 	Add(o *entities.Player) error
 	Delete(o *entities.Player) error
 }
 
 type playerRepo struct {
 	storageManager StorageManager
+	lastPlayerCode int
 }
 
 // NewPlayerRepo returns new instance
 func NewPlayerRepo(sm StorageManager) PlayerRepo {
 	r := playerRepo{
 		storageManager: sm,
+		lastPlayerCode: -1,
 	}
 
 	r.load()
@@ -48,6 +52,15 @@ func (r *playerRepo) GetAll() ([]entities.Player, error) {
 	}
 
 	return allPlayers, nil
+}
+
+func (r *playerRepo) SetLastPlayerCode(lastPlayerCode int) error {
+	r.lastPlayerCode = lastPlayerCode
+	return nil
+}
+
+func (r *playerRepo) GetLastPlayerCode() (int, error) {
+	return 1, nil
 }
 
 func (r *playerRepo) GetByCode(code int) (*entities.Player, error) {

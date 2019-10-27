@@ -21,6 +21,10 @@ type TriggerRequest struct {
 	DeviceType string `json:"devicetype"`
 }
 
+type triggerGetResponse struct {
+	PlayerCode int `json:"playercode"`
+}
+
 // NewTrigger creates new instance of TriggerService
 func NewTrigger(pr repositories.PlayerRepo, dr repositories.DeviceRepo) *Trigger {
 	return &Trigger{services.NewTriggerService(pr, dr)}
@@ -38,10 +42,31 @@ func (h *Trigger) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 		w.Header().Set("Access-Control-Allow-Headers", "authorization,access-control-allow-origin,content-type")
 
+	case "GET":
+		log.Print("/trigger:GET")
+		// trigger get  require user (admin) level access
+		if req.Header.Get("QUEST_AUTH_TYPE") != "user" {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
+		var lastPlayerCode, err = h.svc.GetLastPlayerCode()
+
+		if err != nil {
+			log.Print("Unable to process get trigger")
+			http.Error(w, "Unable to process get trigger", http.StatusInternalServerError)
+			return
+		}
+
+		var getResponse triggerGetResponse
+		getResponse.PlayerCode = lastPlayerCode
+		var tokenGetBytes, _ = json.Marshal(getResponse)
+		w.Write(tokenGetBytes)
+
 	case "POST":
 		log.Print("/trigger:POST")
 
-		// All trigger funcitons require device level access
+		// trigger POST funcitons require device level access
 		if req.Header.Get("QUEST_AUTH_TYPE") != "device" {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
