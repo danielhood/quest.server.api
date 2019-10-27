@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log"
+
 	"github.com/danielhood/quest.server.api/quests"
 	"github.com/danielhood/quest.server.api/repositories"
 )
@@ -29,16 +31,21 @@ func (s *triggerService) GetLastPlayerCode() (int, error) {
 }
 
 func (s *triggerService) Trigger(playerCode int, deviceType string) (string, error) {
+	log.Print("Trigger: playerCode: ", playerCode)
+
+	if deviceType == "ADMIN:TRIGGER" {
+		s.playerRepo.SetLastPlayerCode(playerCode)
+		return quests.QuestResponseActivate, nil
+	}
+
 	player, _ := s.playerRepo.GetByCode(playerCode)
 
 	if player == nil {
+		log.Print("ERROR: Unknown player")
 		return quests.QuestResponseUnknownPlayer, nil
 	}
 
-	if deviceType == "ADMIN:TRIGGER" {
-		s.playerRepo.SetLastPlayerCode(player.Code)
-		return quests.QuestResponseActivate, nil
-	}
+	log.Print("Found player.code: ", player.Code)
 
 	if !player.IsEnabled {
 		return quests.QuestResponseUnknownPlayer, nil

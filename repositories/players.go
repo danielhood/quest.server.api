@@ -60,7 +60,7 @@ func (r *playerRepo) SetLastPlayerCode(lastPlayerCode int) error {
 }
 
 func (r *playerRepo) GetLastPlayerCode() (int, error) {
-	return 1, nil
+	return r.lastPlayerCode, nil
 }
 
 func (r *playerRepo) GetByCode(code int) (*entities.Player, error) {
