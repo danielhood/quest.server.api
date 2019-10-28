@@ -149,6 +149,9 @@ func (h *Player) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		// Return ok, no content
+		w.Write(nil)
+
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
