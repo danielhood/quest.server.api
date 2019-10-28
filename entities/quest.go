@@ -4,6 +4,6 @@ package entities
 type Quest struct {
 	Name      string `json:"name"`
 	Desc      string `json:"desc"`
-	Key       string `josn:"key"`
+	Key       string `json:"key"`
 	IsEnabled bool   `json:"isenabled"`
 }

@@ -22,7 +22,20 @@ func NewQuest(ur repositories.QuestRepo) *Quest {
 }
 
 func (h *Quest) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	h.enableCors(&w)
+
 	switch req.Method {
+	case "OPTIONS":
+
+		log.Print("/token:OPTIONS")
+
+		if req.Header.Get("Access-Control-Request-Method") != "" {
+			w.Header().Set("Allow", req.Header.Get("Access-Control-Request-Method"))
+			w.Header().Set("Access-Control-Allow-Methods", req.Header.Get("Access-Control-Request-Method"))
+		}
+
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,access-control-allow-origin,content-type")
+
 	case "GET":
 
 		// Quest GET requires device or user level access
@@ -142,4 +155,8 @@ func (h *Quest) parsePutRequest(w http.ResponseWriter, req *http.Request) *entit
 	}
 
 	return &quest
+}
+
+func (h *Quest) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
