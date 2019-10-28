@@ -105,12 +105,12 @@ func (h *Quest) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		var quest = h.parsePutRequest(w, req)
 
 		if quest == nil {
+			w.Write(nil)
 			return
 		}
 
 		_ = h.svc.Delete(quest)
-		questBytes, _ := json.Marshal(quest)
-		w.Write(questBytes)
+		w.Write(nil)
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
