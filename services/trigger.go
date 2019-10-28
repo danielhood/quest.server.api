@@ -33,7 +33,7 @@ func (s *triggerService) GetLastPlayerCode() (int, error) {
 func (s *triggerService) Trigger(playerCode int, deviceType string) (string, error) {
 	log.Print("Trigger: playerCode: ", playerCode)
 
-	if deviceType == "ADMIN:TRIGGER" {
+	if deviceType == quests.DeviceTypeAdminTrigger {
 		s.playerRepo.SetLastPlayerCode(playerCode)
 		return quests.QuestResponseActivate, nil
 	}
@@ -56,10 +56,10 @@ func (s *triggerService) Trigger(playerCode int, deviceType string) (string, err
 	}
 
 	switch player.QuestKey {
-	case "FIND_ALL_TREASURE":
+	case quests.QuestKeyFindAllTreasure:
 		findAllTreasureQuest := quests.NewFindAllTreasureQuest(s.playerRepo)
 		return findAllTreasureQuest.Trigger(player, deviceType)
-	case "STARS_ORDERED":
+	case quests.QuestKeyStarsOrdered:
 		starsOrderedQuest := quests.NewStarsOrderedQuest(s.playerRepo)
 		return starsOrderedQuest.Trigger(player, deviceType)
 	default:

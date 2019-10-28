@@ -7,8 +7,10 @@ import (
 
 	"github.com/danielhood/quest.server.api/entities"
 	"github.com/danielhood/quest.server.api/handlers"
+	"github.com/danielhood/quest.server.api/quests"
 	"github.com/danielhood/quest.server.api/repositories"
 	"github.com/danielhood/quest.server.api/security"
+
 	"github.com/go-redis/redis"
 )
 
@@ -44,14 +46,20 @@ func generateDefaultUsers(userRepo repositories.UserRepo) {
 
 func generateDefaultQuests(questRepo repositories.QuestRepo) {
 	log.Print("Generating default quests")
-	if quests, err := questRepo.GetAll(); err != nil {
+	if allQuests, err := questRepo.GetAll(); err != nil {
 		panic(err)
 	} else {
-		if len(quests) == 0 {
+		if len(allQuests) == 0 {
 			questRepo.Add(&entities.Quest{
-				Key:       "FIND_ALL_TREASURE",
+				Key:       quests.QuestKeyFindAllTreasure,
 				Name:      "Find All Treasure",
 				Desc:      "Find all treasure in the kingdom",
+				IsEnabled: true,
+			})
+			questRepo.Add(&entities.Quest{
+				Key:       quests.QuestKeyStarsOrdered,
+				Name:      "Find All Stars",
+				Desc:      "Find all stars in the correct order accross the kingdom",
 				IsEnabled: true,
 			})
 		}
@@ -68,7 +76,7 @@ func generateDefaultPlayers(playerRepo repositories.PlayerRepo) {
 				Code:      12345678,
 				Name:      "Test User",
 				IsEnabled: true,
-				QuestKey:  "FIND_ALL_TREASURE",
+				QuestKey:  quests.QuestKeyFindAllTreasure,
 			})
 		}
 	}

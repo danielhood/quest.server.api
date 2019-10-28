@@ -1,5 +1,10 @@
 package quests
 
+// Admin Types
+
+// DeviceTypeAdminTrigger -
+const DeviceTypeAdminTrigger string = "ADMIN:TRIGGER"
+
 // Treasure Types
 
 // DeviceTypeTreasure1 -
