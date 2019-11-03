@@ -26,6 +26,7 @@ type TokenRequest struct {
 	DeviceKey string `json:"devicekey"`
 }
 
+// TokenResponse holds response model for GET request
 type TokenResponse struct {
 	Token string `json:"token"`
 }

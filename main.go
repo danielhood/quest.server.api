@@ -89,6 +89,7 @@ func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories
 	playerHandler := handlers.NewPlayer(playerRepo)
 	triggerHandler := handlers.NewTrigger(playerRepo, deviceRepo)
 	deviceHandler := handlers.NewDevice(deviceRepo)
+	audioHandler := handlers.NewAudio()
 	questHandler := handlers.NewQuest(questRepo)
 
 	auth := security.NewAuthentication()
@@ -99,6 +100,7 @@ func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories
 	http.Handle("/player", addMiddleware(playerHandler, auth.Authenticate))
 	http.Handle("/trigger", addMiddleware(triggerHandler, auth.Authenticate))
 	http.Handle("/device", addMiddleware(deviceHandler, auth.Authenticate))
+	http.Handle("/device/audio", addMiddleware(audioHandler, auth.Authenticate))
 	http.Handle("/quest", addMiddleware(questHandler, auth.Authenticate))
 }
 
@@ -113,7 +115,7 @@ func main() {
 	log.Print("Quest server starting")
 
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "quest-redis.local:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
