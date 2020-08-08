@@ -82,14 +82,20 @@ func generateDefaultPlayers(playerRepo repositories.PlayerRepo) {
 	}
 }
 
-func createDefaultRoutes(userRepo repositories.UserRepo, playerRepo repositories.PlayerRepo, deviceRepo repositories.DeviceRepo, questRepo repositories.QuestRepo) {
+func createDefaultRoutes(
+	userRepo repositories.UserRepo,
+	playerRepo repositories.PlayerRepo,
+	deviceRepo repositories.DeviceRepo,
+	questRepo repositories.QuestRepo,
+	audioRepo repositories.AudioRepo) {
+
 	pingHandler := handlers.NewPing()
 	tokenHandler := handlers.NewToken(userRepo, deviceRepo)
 	userHandler := handlers.NewUser(userRepo)
 	playerHandler := handlers.NewPlayer(playerRepo)
 	triggerHandler := handlers.NewTrigger(playerRepo, deviceRepo)
 	deviceHandler := handlers.NewDevice(deviceRepo)
-	audioHandler := handlers.NewAudio()
+	audioHandler := handlers.NewAudio(audioRepo)
 	questHandler := handlers.NewQuest(questRepo)
 
 	auth := security.NewAuthentication()
@@ -126,13 +132,14 @@ func main() {
 	playerRepo := repositories.NewPlayerRepo(storageManager)
 	deviceRepo := repositories.NewDeviceRepo(storageManager)
 	questRepo := repositories.NewQuestRepo(storageManager)
+	audioRepo := repositories.NewAudioRepo(storageManager)
 
 	generateDefaultUsers(userRepo)
 	generateDefaultQuests(questRepo)
 	generateDefaultPlayers(playerRepo)
 
 	log.Print("Creating routes")
-	createDefaultRoutes(userRepo, playerRepo, deviceRepo, questRepo)
+	createDefaultRoutes(userRepo, playerRepo, deviceRepo, questRepo, audioRepo)
 
 	// openssl genrsa -out server.key 2048
 	certPath := "server.pem"
